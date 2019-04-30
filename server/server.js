@@ -2,7 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const config = require("./config/application");
 const database = require("./config/database");
-
+const verifyToken = require("./services/auth");
+const userRoutes = require("./routes/user.routes");
 const server = express();
 
 // Setup JWT Key
@@ -24,9 +25,9 @@ server.listen(config.PORT, () => {
 // Database connection
 database.connection.on("error", error => console.log(error));
 database.connection.once("open", () => {
-//   server.use("/user", userRoutes);
-//   server.get("/overview", verifyToken, (request, response) => {
-//     response.json({ status: "Success", message: "Route accessed with authorization", data: null });
-//   });
+  server.use("/user", userRoutes);
+  server.get("/overview", verifyToken, (request, response) => {
+    response.json({ status: "Success", message: "Route accessed with authorization", data: null });
+  });
   console.log("Database connected");
 });
