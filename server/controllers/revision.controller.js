@@ -40,6 +40,7 @@ module.exports = {
         
     },
 
+    //get list of unique titles in the revisions collection
     getUniqueTitles: async (request, response, next) => { 
         await revisionModel.distinct('title', function (err, result) { 
             //log error to json response if one occurs
@@ -55,5 +56,48 @@ module.exports = {
             }
         });
 
-    }
+    }, 
+
+    //for a given title, find the latest revision done to that article
+    getLatestRevision: async (request, response, next) => { 
+        reqTitle = request.query.title; 
+    
+        await revisionModel.find({title: reqTitle})
+        .sort({timestamp: -1})
+        .limit(1)
+        .exec(function(err, result) {
+            if (err) { 
+                response.json({ status: "error", message: "Could not retrieve revision", data: null });
+
+                next(); 
+            //log results to json response if successful
+            } else { 
+                response.json({ status: "success", message: "Fetched latest revision", data: result });
+
+                next(); 
+            }
+        }); 
+
+    },
+
+        //for a given title, find the earliest revision done to that article
+        getOldestRevision: async (request, response, next) => { 
+            reqTitle = request.query.title; 
+        
+            await revisionModel.find({title: reqTitle})
+            .sort({timestamp: 1})
+            .limit(1)
+            .exec(function(err, result) {
+                if (err) { 
+                    response.json({ status: "error", message: "Could not retrieve revision", data: null });
+    
+                    next(); 
+                //log results to json response if successful
+                } else { 
+                    response.json({ status: "success", message: "Fetched oldest revision", data: result });
+    
+                    next(); 
+                }
+            }); 
+        }
 };
