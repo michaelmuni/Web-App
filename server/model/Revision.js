@@ -5,34 +5,34 @@ const Schema = mongoose.Schema;
 
 const RevisionSchema = new Schema({
   revid: {
-    type: int32,
+    type: Number,
     unique: true, 
     required: true,
   },
   parentid: {
-    type: int32,
+    type: Number,
     required: true,
   },
   minor: {
-    type: boolean,
+    type: Boolean,
   },
   user: {
     type: String,
     trim: true       
   },
   anon: {
-    type: String,
+    type: Boolean,
     trim: true
   },
   userid: {
-    type: int32,
+    type: Number,
   },
   timestamp: {
     type: String,
     trim: true
   },
   size: {
-    type: int32,
+    type: Number,
     trim: true
   },
   sha1: {
