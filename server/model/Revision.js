@@ -6,26 +6,26 @@ const Schema = mongoose.Schema;
 const RevisionSchema = new Schema({
   revid: {
     type: Number,
-    unique: true, 
-    required: true,
+    unique: true,
+    required: true
   },
   parentid: {
     type: Number,
-    required: true,
+    required: true
   },
   minor: {
-    type: Boolean,
+    type: Boolean
   },
   user: {
     type: String,
-    trim: true       
+    trim: true
   },
   anon: {
     type: Boolean,
     trim: true
   },
   userid: {
-    type: Number,
+    type: Number
   },
   timestamp: {
     type: String,
@@ -46,9 +46,11 @@ const RevisionSchema = new Schema({
   title: {
     type: String,
     required: true,
-    trim: true, 
-    index: true 
-  },
+    trim: true,
+    index: true
+  }
 });
+
+RevisionSchema.index({ title: 1, timestamp: -1 });
 
 module.exports = mongoose.model("Revision", RevisionSchema, "revisions");
