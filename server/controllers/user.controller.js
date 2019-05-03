@@ -14,9 +14,7 @@ module.exports = {
         !validator.isEmail(request.body.email) ||
         !validator.isPassword(request.body.password)
       ) {
-        response.json({ status: "error", message: "Invalid input data", data: null });
-
-        next();
+        return response.json({ status: "error", message: "Invalid input data", data: null });
       }
 
       const { firstName, lastName, email, password } = request.body;
