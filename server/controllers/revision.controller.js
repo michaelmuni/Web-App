@@ -38,5 +38,21 @@ module.exports = {
             }
         });
         
+    },
+
+    getUniqueTitles: async (request, response, next) => { 
+        await revisionModel.distinct('title', function (err, result) { 
+            //log error to json response if one occurs
+            if (err) { 
+                response.json({ status: "error", message: "Could not retrieve titles", data: null });
+
+                next(); 
+            //log results to json response if successful
+            } else { 
+                response.json({ status: "success", message: "Fetched list of titles", data: result });
+
+                next(); 
+            }
+        });
     }
 };

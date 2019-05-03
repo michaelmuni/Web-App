@@ -46,7 +46,8 @@ const RevisionSchema = new Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true, 
+    index: true 
   },
 });
 
