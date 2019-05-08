@@ -9,5 +9,8 @@ router.get("/latestRevision", revisionController.getLatestRevision)
 router.get("/oldestRevision", revisionController.getOldestRevision)
 router.get("/getHighestRevisions", revisionController.getHighestRevisions)
 router.get("/getLowestRevisions", revisionController.getLowestRevisions)
+router.get("/getHighestRevisionsWithValue", revisionController.getHighestRevisionsWithValue)
+router.get("/getLowestRevisionsWithValue", revisionController.getLowestRevisionsWithValue)
+
 
 module.exports = router;

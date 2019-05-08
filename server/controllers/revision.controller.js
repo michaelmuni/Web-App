@@ -118,6 +118,49 @@ module.exports = {
         }
       });
       },
+          //Get Highest Revisions based on user value
+    getHighestRevisionsWithValue: async (request, response, next) => {
+      reqValue = Number(request.query.value);
+
+      await revisionModel
+      .aggregate([
+        { $group : {_id : "$title", "count": {$sum: 1}}},
+        {$sort : {"count":-1}},
+        {$limit : reqValue}
+    ],function(err,result){
+      if (err) {
+        response.json({ status: "error", message: "Could not retrieve revision", data: null });
+  
+        next();
+        //log results to json response if successful
+      } else {
+        response.json({ status: "success", message: "Fetched highest " + reqValue + " revisions", data: result });
+  
+        next();
+      }
+    });
+    },
+    // Get Lowest Revisions based on user Value
+    getLowestRevisionsWithValue: async (request, response, next) => {
+      reqValue = Number(request.query.value);
+      await revisionModel
+      .aggregate([
+        { $group : {_id : "$title", "count": {$sum: 1}}},
+        {$sort : {"count": 1}},
+        {$limit : reqValue}
+    ],function(err,result){
+      if (err) {
+        response.json({ status: "error", message: "Could not retrieve revision", data: null });
+  
+        next();
+        //log results to json response if successful
+      } else {
+        response.json({ status: "success", message: "Fetched lowest " + reqValue +  " revisions", data: result });
+  
+        next();
+      }
+    });
+    },
 
   //for a given title, find the earliest revision done to that article
   getOldestRevision: async (request, response, next) => {
