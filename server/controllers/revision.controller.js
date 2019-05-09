@@ -76,48 +76,6 @@ module.exports = {
         }
       });
   },
-    //Two Titles with Highest Revision
-    getHighestRevisions: async (request, response, next) => {
-    
-      await revisionModel
-      .aggregate([
-        { $group : {_id : "$title", "count": {$sum: 1}}},
-        {$sort : {"count":-1}},
-        {$limit : 2}
-    ],function(err,result){
-      if (err) {
-        response.json({ status: "error", message: "Could not retrieve revision", data: null });
-  
-        next();
-        //log results to json response if successful
-      } else {
-        response.json({ status: "success", message: "Fetched highest two revisions", data: result });
-  
-        next();
-      }
-    });
-    },
-      //Two Titles with Lowest Revision
-      getLowestRevisions: async (request, response, next) => {
-      
-        await revisionModel
-        .aggregate([
-          { $group : {_id : "$title", "count": {$sum: 1}}},
-          {$sort : {"count": 1}},
-          {$limit : 2}
-      ],function(err,result){
-        if (err) {
-          response.json({ status: "error", message: "Could not retrieve revision", data: null });
-    
-          next();
-          //log results to json response if successful
-        } else {
-          response.json({ status: "success", message: "Fetched lowest two revisions", data: result });
-    
-          next();
-        }
-      });
-      },
           //Get Highest Revisions based on user value
     getHighestRevisionsWithValue: async (request, response, next) => {
       reqValue = Number(request.query.value);
