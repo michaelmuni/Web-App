@@ -45,7 +45,7 @@
       <v-btn flat small color="primary" nuxt to="/">Back</v-btn>
       <v-spacer></v-spacer>
       <v-btn flat small color="error" @click="resetForm">Reset</v-btn>
-      <v-btn color="primary">Register</v-btn>
+      <v-btn color="primary" @click="register">Register</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -97,7 +97,34 @@ export default {
 
       this.$refs.regForm.resetValidation()
     },
-    async register() {}
+    async register() {
+      try {
+        const response = await this.$axios.post('user/register', {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          email: this.email,
+          password: this.password
+        })
+
+        if (response.status !== 'error') {
+          await this.$auth.loginWith('local', {
+            data: {
+              userName: response.data.userName,
+              userEmail: response.data.userEmail,
+              token: response.data.token
+            }
+          })
+
+          //this.$router.push('/overview')
+        } else {
+          this.error = true
+          this.errorMessage = response.message
+        }
+      } catch (error) {
+        this.error = true
+        this.errorMessage = error.response.data.message
+      }
+    }
   }
 }
 </script>
