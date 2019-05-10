@@ -6,6 +6,7 @@ const verifyToken = require("./services/auth");
 const userRoutes = require("./routes/user.routes");
 const revisionRoutes = require("./routes/revision.routes");
 const server = express();
+const cors = require("cors");
 
 // Setup JWT Key
 server.set("secretKey", config.JWT_SECRET);
@@ -17,6 +18,13 @@ server.use(bodyParser.json());
 server.get("/", (request, response) => {
   response.json({ tutorial: "this is a test" });
 });
+
+// Setup CORS
+server.use(
+  cors({
+    origin: "http://localhost:4200"
+  })
+);
 
 // Server startup
 server.listen(config.PORT, () => {
