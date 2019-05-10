@@ -1,5 +1,6 @@
 <template>
   <v-app light>
+    <Navbar/>
     <v-content>
       <v-container>
         <transition name="fade" mode="in-out" appear>
@@ -14,11 +15,16 @@
 </template>
 
 <script>
+import Navbar from '~/components/Navbar.vue'
+
 export default {
   data() {
     return {
       fixed: false
     }
+  },
+  components: {
+    Navbar
   }
 }
 </script>
