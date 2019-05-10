@@ -39,32 +39,33 @@ module.exports = {
       const user = validator.isEmail(request.body.email) ? await userModel.findOne({ email: request.body.email }) : null;
 
       if (!user) {
-        response.json({ status: "error", message: "User does not exist. Please register to continue.", data: null });
+        // response.json({ status: "error", message: "User does not exist. Please register to continue.", data: null });
 
-        next();
+        // next();
+        throw Error("User does not exist. Please register to continue");
       }
       // Perform password decryption and check
       const isMatch = await bcrypt.compare(request.body.password, user.password);
 
       if (!isMatch) {
-        response.json({ status: "error", message: "Invalid password.", data: null });
+        // response.json({ status: "error", message: "Invalid password.", data: null });
 
-        next();
+        // next();
+        throw Error("Invalid password");
       }
       // Create token at successful authentication
       const token = jwt.sign({ id: user._id }, request.app.get("secretKey"), {
         expiresIn: "1h"
       });
 
-      response.json({
+      return response.json({
         status: "success",
-        message: "Authentication successful!",
-        data: { userName: user.firstName + " " + user.lastName, userId: user._id, userEmail: user.email, token: token }
+        token: token
       });
 
-      next();
+      //next();
     } catch (error) {
-      response.json({ status: "error", message: "Something went wrong: " + error, data: null });
+      response.status(500).json({ status: "error", message: "Something went wrong. Please try again" });
 
       next();
     }
