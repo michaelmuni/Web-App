@@ -4,17 +4,22 @@
       <v-toolbar-title v-text="title"/>
     </nuxt-link>
     <v-spacer/>
-    <v-btn flat>Logout</v-btn>
-    <v-btn flat to="/register">Register</v-btn>
-    <v-btn flat to="/login">Login</v-btn>
+    <v-btn v-if="isAuthenticated" flat>Logout</v-btn>
+    <v-btn v-if="!isAuthenticated" flat to="/register">Register</v-btn>
+    <v-btn v-if="!isAuthenticated" flat to="/login">Login</v-btn>
   </v-toolbar>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   data: () => ({
     title: 'Article Insight'
-  })
+  }),
+  computed: {
+    ...mapGetters(['isAuthenticated', 'loggedInUser'])
+  }
 }
 </script>
 
