@@ -5,13 +5,14 @@
     </nuxt-link>
     <v-spacer/>
     <v-toolbar-items>
-      <!-- <label disabled v-if="loggedInUser">{{ loggedInUser.userName }}</label> -->
       <v-btn v-if="isAuthenticated" flat @click="logout">
         Logout
         <v-icon right color="red">power_settings_new</v-icon>
       </v-btn>
-      <v-btn v-if="!isAuthenticated" flat to="/register">Register</v-btn>
-      <v-btn v-if="!isAuthenticated" flat to="/login">Login</v-btn>
+      <template v-else>
+        <v-btn flat to="/register">Register</v-btn>
+        <v-btn flat to="/login">Login</v-btn>
+      </template>
     </v-toolbar-items>
   </v-toolbar>
 </template>
@@ -24,7 +25,10 @@ export default {
     title: "Article Insight"
   }),
   computed: {
-    ...mapGetters(["isAuthenticated", "loggedInUser"])
+    ...mapGetters({
+      isAuthenticated: "user/isAuthenticated",
+      loggedInUser: "user/loggedInUser"
+    })
   },
   methods: {
     async logout() {

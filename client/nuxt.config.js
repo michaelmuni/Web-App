@@ -48,8 +48,7 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    "@nuxtjs/axios",
-    "@nuxtjs/auth"
+    "@nuxtjs/axios"
   ],
   /*
    ** Axios module configuration
@@ -57,22 +56,6 @@ export default {
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
     baseURL: "http://localhost:3000"
-  },
-
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          login: {
-            url: "user/authenticate",
-            method: "post",
-            propertyName: "data"
-          },
-          user: false,
-          logout: false
-        }
-      }
-    }
   },
 
   /*

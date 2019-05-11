@@ -34,6 +34,7 @@ module.exports = {
   },
   // Authenticate user at login
   authenticate: async (request, response, next) => {
+    console.log("Hit");
     try {
       // Validate login form data and existing user
       const user = validator.isEmail(request.body.email) ? await userModel.findOne({ email: request.body.email }) : null;
@@ -58,7 +59,7 @@ module.exports = {
         expiresIn: "1h"
       });
 
-      //request.session.authUser = { userName: user.firstName + " " + user.lastName, userEmail: user.email };
+      request.session.authUser = { userName: user.firstName + " " + user.lastName, userEmail: user.email };
 
       return response.json({
         status: "success",
