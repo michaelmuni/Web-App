@@ -1,12 +1,10 @@
-const express = require("express");
 const bodyParser = require("body-parser");
 const config = require("./config/application");
 const database = require("./config/database");
 const verifyToken = require("./services/auth");
 const userRoutes = require("./routes/user.routes");
 const revisionRoutes = require("./routes/revision.routes");
-const server = express();
-const session = require("express-session");
+const server = require("express")();
 const cors = require("cors");
 
 // Setup JWT Key
@@ -14,16 +12,6 @@ server.set("secretKey", config.JWT_SECRET);
 
 // Setup body parser
 server.use(bodyParser.json());
-
-// Setup session
-server.use(
-  session({
-    secret: "super-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 60000 }
-  })
-);
 
 // Setup CORS
 server.use(

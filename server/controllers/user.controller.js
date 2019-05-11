@@ -34,7 +34,6 @@ module.exports = {
   },
   // Authenticate user at login
   authenticate: async (request, response, next) => {
-    console.log("Hit");
     try {
       // Validate login form data and existing user
       const user = validator.isEmail(request.body.email) ? await userModel.findOne({ email: request.body.email }) : null;
@@ -59,8 +58,6 @@ module.exports = {
         expiresIn: "1h"
       });
 
-      request.session.authUser = { userName: user.firstName + " " + user.lastName, userEmail: user.email };
-
       return response.json({
         status: "success",
         data: {
@@ -72,16 +69,9 @@ module.exports = {
 
       //next();
     } catch (error) {
-      response.status(500).json({ status: "error", message: "Something went wrong. Please try again" });
+      response.status(500).json({ status: "error", message: error.message });
 
       next();
     }
-  },
-
-  profile: async (request, response, next) => {
-    return response.json({
-      status: "success",
-      data: request.session.authUser
-    });
   }
 };

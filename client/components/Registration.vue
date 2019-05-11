@@ -98,28 +98,32 @@ export default {
       this.$refs.regForm.resetValidation();
     },
     async register() {
-      try {
-        const response = await this.$axios.post("user/register", {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          email: this.email,
-          password: this.password
-        });
-
-        if (response.status !== "error") {
-          await this.$store.user.dispatch("login", {
+      if (this.$refs.regForm.validate()) {
+        try {
+          const response = await this.$axios.post("user/register", {
+            firstName: this.firstName,
+            lastName: this.lastName,
             email: this.email,
             password: this.password
           });
 
-          this.$router.push("/overview");
-        } else {
+          if (response.status !== "error") {
+            await this.$store.dispatch("user/login", {
+              email: this.email,
+              password: this.password
+            });
+
+            this.$router.push("/overview");
+          } else {
+            this.error = true;
+            this.errorMessage = response.message;
+          }
+        } catch (error) {
           this.error = true;
-          this.errorMessage = response.message;
+          this.errorMessage = error.response.data.message
+            ? error.response.data.message
+            : error.message;
         }
-      } catch (error) {
-        this.error = true;
-        this.errorMessage = error.response.data.message;
       }
     }
   }

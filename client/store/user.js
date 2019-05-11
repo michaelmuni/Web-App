@@ -21,16 +21,12 @@ export const actions = {
   // },
   async login({ commit }, { email, password }) {
     try {
-      console.log("hit");
-      const data = await this.$axios.$post(
-        "http://localhost:3000/user/authenticate",
-        {
-          email,
-          password
-        }
-      );
-      console.log(data);
-      if (data.status === "error") {
+      const data = await this.$axios.$post("user/authenticate", {
+        email,
+        password
+      });
+
+      if (!data || data.status === "error") {
         throw new Error("Bad credentials");
       }
 
@@ -45,7 +41,6 @@ export const actions = {
   },
 
   async logout({ commit }) {
-    await $axios.post("/api/logout");
     commit("SET_USER", null);
     commit("SET_LOGGEDIN", false);
   }
