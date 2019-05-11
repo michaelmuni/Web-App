@@ -6,6 +6,7 @@ const verifyToken = require("./services/auth");
 const userRoutes = require("./routes/user.routes");
 const revisionRoutes = require("./routes/revision.routes");
 const server = express();
+const session = require("express-session");
 const cors = require("cors");
 
 // Setup JWT Key
@@ -14,10 +15,15 @@ server.set("secretKey", config.JWT_SECRET);
 // Setup body parser
 server.use(bodyParser.json());
 
-// Default route
-server.get("/", (request, response) => {
-  response.json({ tutorial: "this is a test" });
-});
+// Setup session
+server.use(
+  session({
+    secret: "super-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 60000 }
+  })
+);
 
 // Setup CORS
 server.use(
@@ -25,6 +31,11 @@ server.use(
     origin: "http://localhost:4200"
   })
 );
+
+// Default route
+server.get("/", (request, response) => {
+  response.json({ tutorial: "this is a test" });
+});
 
 // Server startup
 server.listen(config.PORT, () => {

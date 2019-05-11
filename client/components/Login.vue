@@ -86,7 +86,7 @@ export default {
             }
           });
 
-          this.$router.push("/");
+          this.$router.push("/overview");
         } catch (e) {
           this.alert = true;
           this.error = e.response.data.message;

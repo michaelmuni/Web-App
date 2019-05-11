@@ -58,9 +58,15 @@ module.exports = {
         expiresIn: "1h"
       });
 
+      //request.session.authUser = { userName: user.firstName + " " + user.lastName, userEmail: user.email };
+
       return response.json({
         status: "success",
-        token: token
+        data: {
+          userName: user.firstName + " " + user.lastName,
+          userEmail: user.email,
+          token: token
+        }
       });
 
       //next();
@@ -69,5 +75,12 @@ module.exports = {
 
       next();
     }
+  },
+
+  profile: async (request, response, next) => {
+    return response.json({
+      status: "success",
+      data: request.session.authUser
+    });
   }
 };

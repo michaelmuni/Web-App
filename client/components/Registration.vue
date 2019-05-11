@@ -53,80 +53,79 @@
 <script>
 export default {
   data: () => ({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
     error: null,
-    errorMessage: '',
+    errorMessage: "",
     validationRules: {
       name: [
-        v => !!v || 'Required',
+        v => !!v || "Required",
         v =>
           /^[a-zA-Z. ]+$/.test(v) ||
-          'Name cannot contain numbers or special charachters.'
+          "Name cannot contain numbers or special charachters."
       ],
       email: [
-        v => !!v || 'Required',
+        v => !!v || "Required",
         v =>
           /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
             v
-          ) || 'Invalid email format'
+          ) || "Invalid email format"
       ],
       password: [
-        v => !!v || 'Required',
-        v => v.length >= 8 || 'Password must be at least 8 characters long',
+        v => !!v || "Required",
+        v => v.length >= 8 || "Password must be at least 8 characters long",
         v =>
           /[A-Z]/.test(v) ||
-          'Password must contain at least one uppercase character',
+          "Password must contain at least one uppercase character",
         v =>
           /[a-z]/.test(v) ||
-          'Password must contain at least one lowercase character',
+          "Password must contain at least one lowercase character",
         v =>
-          /\d/.test(v) || 'Password must contain at least one numeric character'
+          /\d/.test(v) || "Password must contain at least one numeric character"
       ]
     }
   }),
 
   methods: {
     resetForm() {
-      this.firstName = ''
-      this.lastName = ''
-      this.email = ''
-      this.password = ''
+      this.firstName = "";
+      this.lastName = "";
+      this.email = "";
+      this.password = "";
 
-      this.$refs.regForm.resetValidation()
+      this.$refs.regForm.resetValidation();
     },
     async register() {
       try {
-        const response = await this.$axios.post('user/register', {
+        const response = await this.$axios.post("user/register", {
           firstName: this.firstName,
           lastName: this.lastName,
           email: this.email,
           password: this.password
-        })
+        });
 
-        if (response.status !== 'error') {
-          await this.$auth.loginWith('local', {
+        if (response.status !== "error") {
+          await this.$auth.loginWith("local", {
             data: {
-              userName: response.data.userName,
-              userEmail: response.data.userEmail,
-              token: response.data.token
+              email: this.email,
+              password: this.password
             }
-          })
+          });
 
-          //this.$router.push('/overview')
+          this.$router.push("/overview");
         } else {
-          this.error = true
-          this.errorMessage = response.message
+          this.error = true;
+          this.errorMessage = response.message;
         }
       } catch (error) {
-        this.error = true
-        this.errorMessage = error.response.data.message
+        this.error = true;
+        this.errorMessage = error.response.data.message;
       }
     }
   }
-}
+};
 </script>
 
 <style>
