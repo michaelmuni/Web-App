@@ -1,17 +1,24 @@
-const express = require("express");
 const bodyParser = require("body-parser");
 const config = require("./config/application");
 const database = require("./config/database");
 const verifyToken = require("./services/auth");
 const userRoutes = require("./routes/user.routes");
 const revisionRoutes = require("./routes/revision.routes");
-const server = express();
+const server = require("express")();
+const cors = require("cors");
 
 // Setup JWT Key
 server.set("secretKey", config.JWT_SECRET);
 
 // Setup body parser
 server.use(bodyParser.json());
+
+// Setup CORS
+server.use(
+  cors({
+    origin: "http://localhost:4200"
+  })
+);
 
 // Default route
 server.get("/", (request, response) => {
