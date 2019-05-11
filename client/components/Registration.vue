@@ -42,9 +42,8 @@
     </v-card-text>
     <v-alert dismissible v-if="error" type="error">{{ errorMessage }}</v-alert>
     <v-card-actions>
-      <v-btn flat small color="primary" nuxt to="/">Back</v-btn>
-      <v-spacer></v-spacer>
       <v-btn flat small color="error" @click="resetForm">Reset</v-btn>
+      <v-spacer></v-spacer>
       <v-btn color="primary" @click="register">Register</v-btn>
     </v-card-actions>
   </v-card>
