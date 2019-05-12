@@ -140,5 +140,103 @@ module.exports = {
           next();
         }
       });
-  }
+  }, 
+
+  getMostRegisteredUsers: async (request, response, next) => {
+    var mostRegisteredUsersPipeline = [
+      {'$group':{'_id': {"title": "$title", "userid": "$userid"}, 'distinctUsers': {$sum:1}}},
+      {'$group':{'_id': "$_id.title", 'distinctUsers': {$sum:1}}},
+      {'$sort':{distinctUsers:-1}},
+      {'$limit':1}	
+    ]
+
+
+    await revisionModel.aggregate(mostRegisteredUsersPipeline, function(err, result) { 
+      if (err){
+
+        response.json({ status: "error", message: "Problem with executing aggregate function", data: null}); 
+        
+        next(); 
+      } else {
+
+        response.json({ status: "success", message: "Fetched article edited by most users", data: result });
+
+        next(); 
+      }
+    })
+  }, 
+
+  getLeastRegisteredUsers: async (request, response, next) => {
+    var leastRegisteredUsersPipeline = [
+      {'$group':{'_id': {"title": "$title", "userid": "$userid"}, 'distinctUsers': {$sum:1}}},
+      {'$group':{'_id': "$_id.title", 'distinctUsers': {$sum:1}}},
+      {'$sort':{distinctUsers:1}},
+      {'$limit':1}	
+    ]
+
+
+    await revisionModel.aggregate(leastRegisteredUsersPipeline, function(err, result) { 
+      if (err){
+
+        response.json({ status: "error", message: "Problem with executing aggregate function", data: null}); 
+        
+        next(); 
+      } else {
+
+        response.json({ status: "success", message: "Fetched article edited by fewest users", data: result });
+
+        next(); 
+      }
+    })
+  }, 
+
+  getOldestArticle: async (request, response, next) => {
+    var oldestArticlePipeline = [
+      {'$group': {'_id': "$title", 'oldest': { $min: "$timestamp" }}}, 
+      {'$project': {'title': 1, 'olddate': { $dateFromString: { dateString: "$oldest" }}}}, 
+      {'$project': {'title': 1, 'age': { $subtract: [new Date(), "$olddate"]}}}, 
+      {'$sort': {age: -1}}, 
+      {'$limit': 1}
+    ]
+
+      await revisionModel.aggregate(oldestArticlePipeline, function(err, result) { 
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with executing aggregate function", data: null}); 
+          
+          next(); 
+
+        } else {
+  
+          response.json({ status: "success", message: "Fetched oldest article", data: result });
+  
+          next(); 
+        }
+      })
+  }, 
+
+  getYoungestArticle: async (request, response, next) => {
+    var youngestArticlePipeline = [
+      {'$group': {'_id': "$title", 'oldest': { $min: "$timestamp" }}}, 
+      {'$project': {'title': 1, 'olddate': { $dateFromString: { dateString: "$oldest" }}}}, 
+      {'$project': {'title': 1, 'age': { $subtract: [new Date(), "$olddate"]}}}, 
+      {'$sort': {age: 1}}, 
+      {'$limit': 1}
+    ]
+
+      await revisionModel.aggregate(youngestArticlePipeline, function(err, result) { 
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with executing aggregate function", data: null}); 
+          
+          next(); 
+
+        } else {
+  
+          response.json({ status: "success", message: "Fetched youngest article", data: result });
+  
+          next(); 
+        }
+      })
+    }
 };
