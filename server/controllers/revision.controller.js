@@ -1,5 +1,7 @@
 const revisionModel = require("../model/Revision");
 const validator = require("../services/validator");
+const fs = require('fs')
+const async = require('async')
 
 module.exports = {
   // fetch a count of all records
@@ -234,6 +236,86 @@ module.exports = {
         } else {
   
           response.json({ status: "success", message: "Fetched youngest article", data: result });
+  
+          next(); 
+        }
+      })
+    }, 
+
+    getRevisionsByUserType: async (request, response, next) => {
+
+      function readAsync(file, callback) {
+        fs.readFile(file, 'utf8', callback);
+      }
+
+      await revisionModel.find({}, function(err, results) {
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with getting revisions by user type", data: null}); 
+          
+          next(); 
+
+        } else {
+          
+          var bot_contents = "";
+          var admin_contents = "";
+
+          files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+          async.map(files, readAsync, function(err, contents) {
+            if (contents) { 
+              bot_contents = contents[0].toString(); 
+              admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString(); 
+              userArticleCount = {'anon': 0, 'bot': 0, 'admin': 0, 'regular': 0}
+
+              for (var i=0; i < results.length; i++) {
+                if (results[i].anon) {
+                  userArticleCount['anon'] += 1; 
+                } else if (admin_contents.includes(results[i].user)) { 
+                  userArticleCount['admin'] += 1; 
+                } else if (bot_contents.includes(results[i].user)) { 
+                  userArticleCount['bot'] += 1; 
+                } else { 
+                  userArticleCount['regular'] += 1; 
+                }
+              }
+    
+              response.json({ status: "success", message: "got breakdown of revisions by user type", data: userArticleCount}); 
+              next(); 
+
+            }
+          });
+
+        }
+      })
+    }, 
+
+    displaySummaryInformation: async (request, response, next) => {
+      reqTitle = request.query.title;
+
+      var summaryPipeline = [
+        {"$match": { 'title': reqTitle }}, 
+        {'$facet': {
+          "Total": [ 
+            {'$count': "Total"}
+          ], 
+          "TopFive": [
+            {'$group': {'_id': "$user", "usercount": {$sum: 1}}},
+            {'$sort': { "usercount" : -1}}, 
+            {'$limit': 5}
+          ]
+        }
+      }]
+
+      await revisionModel.aggregate(summaryPipeline, function(err, result) { 
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with fetching individual article summary", data: null}); 
+          
+          next(); 
+
+        } else {
+          response.json({ status: "success", message: "Fetched individual summary article for " + reqTitle, data: result });
   
           next(); 
         }
