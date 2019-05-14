@@ -15,5 +15,6 @@ router.get("/getOldestArticle", revisionController.getOldestArticle);
 router.get("/getYoungestArticle", revisionController.getYoungestArticle);
 router.get("/getRevisionsByUserType", revisionController.getRevisionsByUserType);
 router.get("/displaySummaryInfo", revisionController.displaySummaryInformation);
+router.get("/getArticleRevsByUserType", revisionController.getArticleRevisionsByUserType);
 
 module.exports = router;

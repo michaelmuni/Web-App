@@ -292,9 +292,23 @@ module.exports = {
 
     displaySummaryInformation: async (request, response, next) => {
       reqTitle = request.query.title;
+      reqFrom = request.query.fromyear ? request.query.fromyear : "1970"; 
+      reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString(); 
+
+      stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
+      stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
 
       var summaryPipeline = [
-        {"$match": { 'title': reqTitle }}, 
+        {"$match": { 'title': reqTitle, '$expr': 
+        {'$and': [
+          {
+            $gte: ["$timestamp", stringFrom]
+          }, 
+          {
+            $lte: ["$timestamp", stringTo]
+          }
+        ]       
+        }}}, 
         {'$facet': {
           "Total": [ 
             {'$count': "Total"}
@@ -318,6 +332,56 @@ module.exports = {
           response.json({ status: "success", message: "Fetched individual summary article for " + reqTitle, data: result });
   
           next(); 
+        }
+      })
+    }, 
+
+    getArticleRevisionsByUserType: async (request, response, next) => {
+
+      function readAsync(file, callback) {
+        fs.readFile(file, 'utf8', callback);
+      }
+
+      reqTitle = request.query.title; 
+
+      await revisionModel.find({title: reqTitle}, function(err, results) {
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with getting revisions for " + reqTitle + " by user type", data: null}); 
+          
+          next(); 
+
+        } else {
+          
+          var bot_contents = "";
+          var admin_contents = "";
+
+          files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+          async.map(files, readAsync, function(err, contents) {
+            if (contents) { 
+              bot_contents = contents[0].toString(); 
+              admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString(); 
+              userArticleCount = {'anon': 0, 'bot': 0, 'admin': 0, 'regular': 0}
+
+              for (var i=0; i < results.length; i++) {
+                if (results[i].anon) {
+                  userArticleCount['anon'] += 1; 
+                } else if (admin_contents.includes(results[i].user)) { 
+                  userArticleCount['admin'] += 1; 
+                } else if (bot_contents.includes(results[i].user)) { 
+                  userArticleCount['bot'] += 1; 
+                } else { 
+                  userArticleCount['regular'] += 1; 
+                }
+              }
+    
+              response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type", data: userArticleCount}); 
+              next(); 
+
+            }
+          });
+
         }
       })
     }
