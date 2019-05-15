@@ -384,5 +384,133 @@ module.exports = {
 
         }
       })
+    }, 
+
+    getRevsByUserTypeAndYear: async (request, response, next) => {
+
+      function readAsync(file, callback) {
+        fs.readFile(file, 'utf8', callback);
+      }
+
+      function insertIntoDict(dict, year, usertype) { 
+        if (dict[year]) {
+          if (dict[year][usertype]) { 
+            dict[year][usertype] += 1; 
+          } else { 
+            dict[year][usertype] = 1; 
+          }
+        } else { 
+          dict[year] = {};
+          dict[year][usertype] = 1; 
+        }
+      }
+
+      await revisionModel.find({}, function(err, results) {
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with getting revisions by user type and year", data: null}); 
+          
+          next(); 
+
+        } else {
+          
+          var bot_contents = "";
+          var admin_contents = "";
+
+          files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+          async.map(files, readAsync, function(err, contents) {
+            if (contents) { 
+              bot_contents = contents[0].toString(); 
+              admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString(); 
+              userArticleCount = {};
+
+              for (var i=0; i < results.length; i++) {
+                year = new Date(results[i].timestamp).getFullYear(); 
+
+                if (results[i].anon) {
+                  insertIntoDict(userArticleCount, year, 'anon'); 
+                } else if (admin_contents.includes(results[i].user)) { 
+                  insertIntoDict(userArticleCount, year, 'admin'); 
+                } else if (bot_contents.includes(results[i].user)) { 
+                  insertIntoDict(userArticleCount, year, 'bot'); 
+                } else { 
+                  insertIntoDict(userArticleCount, year, 'regular'); 
+                }
+              }
+    
+              response.json({ status: "success", message: "got breakdown of revisions by user type and year", data: userArticleCount}); 
+              next(); 
+
+            }
+          });
+
+        }
+      })
+    }, 
+
+    getArticleRevsByUserTypeAndYear: async (request, response, next) => {
+
+      function readAsync(file, callback) {
+        fs.readFile(file, 'utf8', callback);
+      }
+
+      function insertIntoDict(dict, year, usertype) { 
+        if (dict[year]) {
+          if (dict[year][usertype]) { 
+            dict[year][usertype] += 1; 
+          } else { 
+            dict[year][usertype] = 1; 
+          }
+        } else { 
+          dict[year] = {};
+          dict[year][usertype] = 1; 
+        }
+      }
+
+      reqTitle = request.query.title; 
+
+      await revisionModel.find({title: reqTitle}, function(err, results) {
+        if (err){
+  
+          response.json({ status: "error", message: "Problem with getting revisions for " + reqTitle + " by user type and year", data: null}); 
+          
+          next(); 
+
+        } else {
+          
+          var bot_contents = "";
+          var admin_contents = "";
+
+          files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+          async.map(files, readAsync, function(err, contents) {
+            if (contents) { 
+              bot_contents = contents[0].toString(); 
+              admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString(); 
+              userArticleCount = {};
+
+              for (var i=0; i < results.length; i++) {
+                year = new Date(results[i].timestamp).getFullYear(); 
+
+                if (results[i].anon) {
+                  insertIntoDict(userArticleCount, year, 'anon'); 
+                } else if (admin_contents.includes(results[i].user)) { 
+                  insertIntoDict(userArticleCount, year, 'admin'); 
+                } else if (bot_contents.includes(results[i].user)) { 
+                  insertIntoDict(userArticleCount, year, 'bot'); 
+                } else { 
+                  insertIntoDict(userArticleCount, year, 'regular'); 
+                }
+              }
+    
+              response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type and year", data: userArticleCount}); 
+              next(); 
+
+            }
+          });
+
+        }
+      })
     }
 };
