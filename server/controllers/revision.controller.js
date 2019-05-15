@@ -80,16 +80,16 @@ module.exports = {
   },
   //Get Highest Revisions based on user value
   getHighestRevisionsWithValue: async (request, response, next) => {
-    reqValue = Number(request.query.value);
+    const limit = Number(request.query.limit);
 
-    await revisionModel.aggregate([{ $group: { _id: "$title", count: { $sum: 1 } } }, { $sort: { count: -1 } }, { $limit: reqValue }], function(err, result) {
+    await revisionModel.aggregate([{ $group: { _id: "$title", count: { $sum: 1 } } }, { $sort: { count: -1 } }, { $limit: limit }], function(err, result) {
       if (err) {
         response.json({ status: "error", message: "Could not retrieve revision", data: null });
 
         next();
         //log results to json response if successful
       } else {
-        response.json({ status: "success", message: "Fetched highest " + reqValue + " revisions", data: result });
+        response.json({ status: "success", message: "Fetched highest " + limit + " revisions", data: result });
 
         next();
       }
