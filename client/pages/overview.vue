@@ -1,11 +1,21 @@
 <template>
-  <v-layout align-center justify-center>
-    <v-flex xs12 sm8 md6></v-flex>
+  <v-layout align-center>
+    <v-flex>
+      <HorizontalCards objectType="hirev" objectHeader="Articles with Highest Revisions"/>
+    </v-flex>
   </v-layout>
 </template>
 
 <script>
+import HorizontalCards from "~/components/HorizontalCards.vue";
+
 export default {
   //middleware: "auth"
+  components: {
+    HorizontalCards
+  },
+  beforeCreate() {
+    this.$store.dispatch("user/initializeStore");
+  }
 };
 </script>
