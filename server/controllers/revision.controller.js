@@ -438,8 +438,12 @@ module.exports = {
                   insertIntoDict(userArticleCount, year, 'regular'); 
                 }
               }
+
+              var output = Object.keys(userArticleCount).map(function(key) {
+                return {type: key, name: userArticleCount[key]};
+              });
     
-              response.json({ status: "success", message: "got breakdown of revisions by user type and year", data: userArticleCount}); 
+              response.json({ status: "success", message: "got breakdown of revisions by user type and year", data: output}); 
               next(); 
 
             }
@@ -503,8 +507,14 @@ module.exports = {
                   insertIntoDict(userArticleCount, year, 'regular'); 
                 }
               }
+
+              var output = Object.keys(userArticleCount).map(function(key) {
+                return {type: key, name: userArticleCount[key]};
+              });
+             
+             // display the result
     
-              response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type and year", data: userArticleCount}); 
+              response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type and year", data: output}); 
               next(); 
 
             }
