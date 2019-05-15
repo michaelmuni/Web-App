@@ -26,9 +26,7 @@
     </v-card-text>
     <v-alert v-model="alert" dismissible v-if="alert" type="error">{{ error }}</v-alert>
     <v-card-actions>
-      <v-btn flat small nuxt to="/register">Register</v-btn>
       <v-spacer></v-spacer>
-      <v-btn flat small nuxt to="/register">Register</v-btn>
       <v-btn color="primary" @click="login">Login</v-btn>
     </v-card-actions>
   </v-card>
