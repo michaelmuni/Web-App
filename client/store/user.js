@@ -32,6 +32,7 @@ export const actions = {
 
       commit("SET_USER", data);
       commit("SET_LOGGEDIN", true);
+      localStorage.setItem("store", JSON.stringify(this.state));
     } catch (error) {
       if (error.response && error.response.status === 401) {
         throw new Error("Bad credentials");
@@ -43,6 +44,15 @@ export const actions = {
   async logout({ commit }) {
     commit("SET_USER", null);
     commit("SET_LOGGEDIN", false);
+    localStorage.clear();
+  },
+
+  initializeStore(state) {
+    if (localStorage.getItem("store")) {
+      this.replaceState(
+        Object.assign(state, JSON.parse(localStorage.getItem("store")))
+      );
+    }
   }
 };
 
