@@ -10,7 +10,7 @@
 import HorizontalCards from "~/components/HorizontalCards.vue";
 
 export default {
-  //middleware: "auth"
+  middleware: "auth",
   components: {
     HorizontalCards
   },
