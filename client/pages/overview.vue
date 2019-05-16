@@ -9,6 +9,11 @@
         objectHeader="Articles with Highest Revisions"
         :counter="counter"
       />
+      <HorizontalCards
+        objectType="lorev"
+        objectHeader="Articles with Lowest Revisions"
+        :counter="counter"
+      />
     </v-flex>
   </v-layout>
 </template>

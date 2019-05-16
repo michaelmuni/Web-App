@@ -60,18 +60,50 @@ export default {
           this.items.push(item);
         }
       }
+    },
+
+    async getLowestRevisionArticles() {
+      this.items = [];
+      this.loading = true;
+      const data = await this.$axios.$get(
+        "revisions/getLowestRevisionsWithValue",
+        {
+          headers: {
+            "x-access-token": this.$store.state.user.authUser.data.token
+          },
+          params: { limit: this.counter }
+        }
+      );
+
+      if (data) {
+        this.loading = false;
+        for (var i = 0; i < data.data.length; i++) {
+          let item = {
+            title: data.data[i]._id,
+            info: "Revisions: " + data.data[i].count
+          };
+
+          this.items.push(item);
+        }
+      }
     }
   },
   created() {
     if (this.objectType === "hirev") {
       this.getHighestRevisionArticles();
+    } else {
+      this.getLowestRevisionArticles();
     }
   },
   watch: {
     counter: function(value) {
       if (value != "") {
         //console.log(value);
-        this.getHighestRevisionArticles();
+        if (this.objectType === "hirev") {
+          this.getHighestRevisionArticles();
+        } else {
+          this.getLowestRevisionArticles();
+        }
       }
     }
   }
