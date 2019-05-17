@@ -9,12 +9,7 @@
           <div class="loader" v-if="loading">
             <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
           </div>
-          <Article
-            v-for="item in items"
-            :key="item.title"
-            v-bind:title="item.title"
-            v-bind:info="item.info"
-          />
+          <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
         </div>
       </v-layout>
     </v-layout>
@@ -55,7 +50,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info: "Revisions: " + data.data[i].count
           };
 
@@ -84,7 +79,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info: "Revisions: " + data.data[i].count
           };
 
@@ -107,7 +102,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info: "Registered Users: " + data.data[i].distinctUsers
           };
 
@@ -128,7 +123,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info: "Registered Users: " + data.data[i].distinctUsers
           };
 
@@ -152,7 +147,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info:
               "Age: " +
               Math.floor(data.data[i].age / (1000 * 60 * 60 * 24)) +
@@ -179,7 +174,7 @@ export default {
         this.loading = false;
         for (var i = 0; i < data.data.length; i++) {
           let item = {
-            title: data.data[i]._id,
+            title: data.data[i]._id.trim(),
             info:
               "Age: " +
               Math.floor(data.data[i].age / (1000 * 60 * 60 * 24)) +

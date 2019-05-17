@@ -1,7 +1,10 @@
 <template>
   <v-toolbar fixed app>
     <nuxt-link class="pageTitle" to="/">
-      <v-toolbar-title v-text="title"/>
+      <v-layout row>
+        <v-icon large left color="primary">trending_up</v-icon>
+        <v-toolbar-title class="ml-0" v-text="title"/>
+      </v-layout>
     </nuxt-link>
     <v-spacer/>
 

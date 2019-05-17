@@ -273,7 +273,7 @@ module.exports = {
     });
   },
 
-  getRevisionsByUserType2: async (request, response, next) => {
+  getRevisionDistributionByYearUser: async (request, response, next) => {
     function readAsync(file, callback) {
       fs.readFile(file, "utf8", callback);
     }

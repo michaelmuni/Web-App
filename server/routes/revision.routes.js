@@ -14,7 +14,7 @@ router.get("/getLeastRegUsers", revisionController.getLeastRegisteredUsers);
 router.get("/getOldestArticle", revisionController.getOldestArticle);
 router.get("/getYoungestArticle", revisionController.getYoungestArticle);
 router.get("/getRevisionsByUserType", revisionController.getRevisionsByUserType);
-router.get("/getRevisionsByUserType2", revisionController.getRevisionsByUserType2);
+router.get("/getRevisionDistributionByYearUser", revisionController.getRevisionDistributionByYearUser);
 router.get("/displaySummaryInfo", revisionController.displaySummaryInformation);
 router.get("/getArticleRevsByUserType", revisionController.getArticleRevisionsByUserType);
 router.get("/getRevsByUserTypeAndYear", revisionController.getRevsByUserTypeAndYear);

@@ -5,7 +5,6 @@
     </v-card-title>
     <v-card-text>
       <canvas id="fooCanvas" count="4"/>
-
       <!-- <chartjs-bar
         v-for="(item, index) in types"
         v-bind:key="index"
@@ -96,11 +95,14 @@ export default {
   }),
   methods: {
     async getOverallYearRevisionDist() {
-      const data = await this.$axios.$get("revisions/getRevisionsByUserType2", {
-        headers: {
-          "x-access-token": this.$store.state.user.authUser.data.token
+      const data = await this.$axios.$get(
+        "revisions/getRevisionDistributionByYearUser",
+        {
+          headers: {
+            "x-access-token": this.$store.state.user.authUser.data.token
+          }
         }
-      });
+      );
 
       //console.log(data);
       this.labels = [];
@@ -127,7 +129,7 @@ export default {
       }
     }
   },
-  created() {
+  mounted() {
     this.getOverallYearRevisionDist();
   }
 };
