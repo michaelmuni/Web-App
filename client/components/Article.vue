@@ -1,11 +1,9 @@
 <template>
-  <v-card class="ma-2">
-    <v-card-title primary-title>
-      <div>
-        <h3 class="headline mb-0">{{ title }}</h3>
-        <div>{{ info }}</div>
-      </div>
+  <v-card max-width="160px" class="ma-2 my-3 elevation-5">
+    <v-card-title primary-title class="primary white--text">
+      <h4 class="mb-0">{{ title }}</h4>
     </v-card-title>
+    <v-card-text>{{ info }}</v-card-text>
   </v-card>
 </template>
 

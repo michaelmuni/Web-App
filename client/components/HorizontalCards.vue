@@ -2,19 +2,14 @@
   <v-container grid-list-md text-xs-center>
     <v-layout column>
       <v-layout align-center row>
-        <h2 class="pb-4">{{ objectHeader }} |</h2>
+        <h2 class="pb-4">{{ objectHeader }}</h2>
       </v-layout>
       <v-layout wrap row>
         <div class="box">
           <div class="loader" v-if="loading">
             <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
           </div>
-          <Article
-            v-for="item in items"
-            :key="item.title"
-            v-bind:title="item.title"
-            v-bind:info="item.info"
-          />
+          <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
         </div>
       </v-layout>
     </v-layout>

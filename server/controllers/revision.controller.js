@@ -269,6 +269,47 @@ module.exports = {
     });
   },
 
+  getRevisionsByUserType2: async (request, response, next) => {
+    function readAsync(file, callback) {
+      fs.readFile(file, "utf8", callback);
+    }
+
+    const files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+    async.map(files, readAsync, async (error, contents) => {
+      var userBots = contents[0].toString().split("\r\n");
+      var userAdminActive = contents[1].toString().split("\r\n");
+      var userAdminInactive = contents[2].toString().split("\r\n");
+      var userAdminSemi = contents[3].toString().split("\r\n");
+      var userAdminFormer = contents[4].toString().split("\r\n");
+      var allAdmins = userAdminActive + userAdminInactive + userAdminSemi + userAdminFormer;
+
+      var botResult = await revisionModel.aggregate([
+        {
+          $project: {
+            title: "$title",
+            user: "$user",
+            anon: "$anon",
+            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+          }
+        },
+        {
+          $match: {
+            user: { $in: userBots }
+          }
+        },
+        {
+          $group: {
+            _id: "$year",
+            revisions: { $sum: 1 }
+          }
+        }
+      ]);
+
+      response.json({ status: "success", message: "got stuff", data: botResult });
+    });
+  },
+
   displaySummaryInformation: async (request, response, next) => {
     reqTitle = request.query.title;
     reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
