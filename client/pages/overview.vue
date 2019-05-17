@@ -43,17 +43,20 @@
           :counter="counter"
         />
       </v-layout>
+      <BarChart/>
     </v-layout>
   </v-layout>
 </template>
 
 <script>
 import HorizontalCards from "~/components/HorizontalCards.vue";
+import BarChart from "~/components/BarChart.vue";
 
 export default {
   middleware: "auth",
   components: {
-    HorizontalCards
+    HorizontalCards,
+    BarChart
   },
   data: () => ({
     counter: 2,

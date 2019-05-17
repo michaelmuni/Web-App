@@ -311,6 +311,11 @@ module.exports = {
                     _id: "$year",
                     bot_revisions: { $sum: 1 }
                   }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
                 }
               ],
               function(err, results) {
@@ -343,6 +348,11 @@ module.exports = {
                   $group: {
                     _id: "$year",
                     admin_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
                   }
                 }
               ],
@@ -377,6 +387,11 @@ module.exports = {
                     _id: "$year",
                     anon_revisions: { $sum: 1 }
                   }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
                 }
               ],
               function(err, results) {
@@ -409,6 +424,11 @@ module.exports = {
                   $group: {
                     _id: "$year",
                     reg_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
                   }
                 }
               ],
