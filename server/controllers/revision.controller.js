@@ -178,12 +178,14 @@ module.exports = {
   },
 
   getOldestArticle: async (request, response, next) => {
+    const limit = parseInt(request.query.limit);
+
     var oldestArticlePipeline = [
       { $group: { _id: "$title", oldest: { $min: "$timestamp" } } },
       { $project: { title: 1, olddate: { $dateFromString: { dateString: "$oldest" } } } },
       { $project: { title: 1, age: { $subtract: [new Date(), "$olddate"] } } },
       { $sort: { age: -1 } },
-      { $limit: 1 }
+      { $limit: limit }
     ];
 
     await revisionModel.aggregate(oldestArticlePipeline, function(err, result) {
@@ -194,7 +196,7 @@ module.exports = {
       } else {
         var data = result;
         // converting milliseconds to days
-        data[0].age = Math.floor(parseInt(data[0].age) / (1000 * 60 * 60 * 24));
+        //data[0].age = Math.floor(parseInt(data[0].age) / (1000 * 60 * 60 * 24));
         response.json({ status: "success", message: "Fetched oldest article", data: data });
 
         next();
@@ -203,12 +205,14 @@ module.exports = {
   },
 
   getYoungestArticle: async (request, response, next) => {
+    const limit = parseInt(request.query.limit);
+
     var youngestArticlePipeline = [
       { $group: { _id: "$title", oldest: { $min: "$timestamp" } } },
       { $project: { title: 1, olddate: { $dateFromString: { dateString: "$oldest" } } } },
       { $project: { title: 1, age: { $subtract: [new Date(), "$olddate"] } } },
       { $sort: { age: 1 } },
-      { $limit: 1 }
+      { $limit: limit }
     ];
 
     await revisionModel.aggregate(youngestArticlePipeline, function(err, result) {
@@ -219,7 +223,7 @@ module.exports = {
       } else {
         var data = result;
         // converting milliseconds to days
-        data[0].age = Math.floor(parseInt(data[0].age) / (1000 * 60 * 60 * 24));
+        //data[0].age = Math.floor(parseInt(data[0].age) / (1000 * 60 * 60 * 24));
         response.json({ status: "success", message: "Fetched youngest article", data: data });
 
         next();
@@ -284,152 +288,161 @@ module.exports = {
       var userAdminFormer = contents[4].toString().split("\r\n");
       var allAdmins = userAdminActive.concat(userAdminInactive.concat(userAdminSemi.concat(userAdminFormer)));
 
-      async.parallel({
-      bot: function(cb) {
-        revisionModel.aggregate([
+      async.parallel(
         {
-          $project: {
-            title: "$title",
-            user: "$user",
-            anon: "$anon",
-            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
-          }
-        },
-        {
-          $match: {
-            user: { $in: userBots }
-          }
-        },
-        {
-          $group: {
-            _id: "$year",
-            bot_revisions: { $sum: 1 }
-          }
-        }
-      ], function(err, results) { 
-        if (err) {
-          cb(err); 
-        } else { 
-          cb(null, results);
-        }
-      });
-    }, 
-    
-    admin: function(cb) {
-      revisionModel.aggregate([
-        {
-          $project: {
-            title: "$title",
-            user: "$user",
-            anon: "$anon",
-            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
-          }
-        },
-        {
-          $match: {
-            user: { $in: allAdmins }
-          }
-        },
-        {
-          $group: {
-            _id: "$year",
-            admin_revisions: { $sum: 1 }
-          }
-        }
-      ], function(err, results) { 
-        if (err) {
-          cb(err); 
-        } else { 
-          cb(null, results);
-        }
-      });
-    }, 
+          bot: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    user: { $in: userBots }
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    bot_revisions: { $sum: 1 }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
 
-    anon: function(cb) {
-      revisionModel.aggregate([
-        {
-          $project: {
-            title: "$title",
-            user: "$user",
-            anon: "$anon",
-            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+          admin: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    user: { $in: allAdmins }
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    admin_revisions: { $sum: 1 }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
+
+          anon: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    anon: { $exists: true }
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    anon_revisions: { $sum: 1 }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
+
+          regular: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    reg_revisions: { $sum: 1 }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
           }
         },
-        {
-          $match: {
-            anon: { $exists: true }
-          }
-        },
-        {
-          $group: {
-            _id: "$year",
-            anon_revisions: { $sum: 1 }
-          }
-        }
-      ], function(err, results) { 
-        if (err) {
-          cb(err); 
-        } else { 
-          cb(null, results);
-        }
-      });
-    },
 
-    regular: function(cb) {
-      revisionModel.aggregate([
-        {
-          $project: {
-            title: "$title",
-            user: "$user",
-            anon: "$anon",
-            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
-          }
-        },
-        {
-          $match: {
-            $and: [
-              {user: {$nin: allAdmins}}, 
-              {user: {$nin: userBots}},
-              {anon: {$exists: false}}
-            ] 
-          }
-        },
-        {
-          $group: {
-            _id: "$year",
-            reg_revisions: { $sum: 1 }
+        function(err, results) {
+          if (err) {
+            response.json({ status: "error", message: "didn't get stuff", data: err });
+            next();
+          } else {
+            json1 = results.admin;
+            json2 = results.bot;
+            json3 = results.anon;
+            json4 = results.regular;
+
+            mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
+            mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
+            mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
+
+            response.json({ status: "success", message: "got stuff", data: mapped_res });
+            next();
           }
         }
-      ], function(err, results) { 
-        if (err) {
-          cb(err); 
-        } else { 
-          cb(null, results);
-        }
-      });
-    }
-
-    }, 
-
-    function(err, results) { 
-      if (err) { 
-        response.json({ status: "error", message: "didn't get stuff", data: err });
-        next(); 
-      } else { 
-        json1 = results.admin;
-        json2 = results.bot; 
-        json3 = results.anon; 
-        json4 = results.regular; 
-
-        mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
-        mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
-        mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
-
-        response.json({ status: "success", message: "got stuff", data: mapped_res });
-        next(); 
-      }
+      );
     });
-  })
   },
 
   displaySummaryInformation: async (request, response, next) => {

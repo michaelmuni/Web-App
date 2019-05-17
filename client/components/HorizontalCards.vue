@@ -2,14 +2,19 @@
   <v-container grid-list-md text-xs-center>
     <v-layout column>
       <v-layout align-center row>
-        <h2 class="pb-4">{{ objectHeader }}</h2>
+        <h2 class="pb-1">{{ objectHeader }}</h2>
       </v-layout>
       <v-layout wrap row>
         <div class="box">
           <div class="loader" v-if="loading">
             <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
           </div>
-          <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
+          <Article
+            v-for="item in items"
+            :key="item.title"
+            v-bind:title="item.title"
+            v-bind:info="item.info"
+          />
         </div>
       </v-layout>
     </v-layout>
@@ -34,6 +39,8 @@ export default {
       //console.log(this.$store.state.user.authUser.data.token);
       this.items = [];
       this.loading = true;
+      this.$emit("loading", true);
+
       const data = await this.$axios.$get(
         "revisions/getHighestRevisionsWithValue",
         {
@@ -55,11 +62,14 @@ export default {
           this.items.push(item);
         }
       }
+      this.$emit("loading", false);
     },
 
     async getLowestRevisionArticles() {
       this.items = [];
       this.loading = true;
+      this.$emit("loading", true);
+
       const data = await this.$axios.$get(
         "revisions/getLowestRevisionsWithValue",
         {
@@ -81,23 +91,143 @@ export default {
           this.items.push(item);
         }
       }
+      this.$emit("loading", false);
+    },
+
+    async getMostRegisteredUserArticle() {
+      this.items = [];
+      this.loading = true;
+      const data = await this.$axios.$get("revisions/getMostRegUsers", {
+        headers: {
+          "x-access-token": this.$store.state.user.authUser.data.token
+        }
+      });
+
+      if (data) {
+        this.loading = false;
+        for (var i = 0; i < data.data.length; i++) {
+          let item = {
+            title: data.data[i]._id,
+            info: "Registered Users: " + data.data[i].distinctUsers
+          };
+
+          this.items.push(item);
+        }
+      }
+    },
+    async getLeastRegisteredUserArticle() {
+      this.items = [];
+      this.loading = true;
+      const data = await this.$axios.$get("revisions/getLeastRegUsers", {
+        headers: {
+          "x-access-token": this.$store.state.user.authUser.data.token
+        }
+      });
+
+      if (data) {
+        this.loading = false;
+        for (var i = 0; i < data.data.length; i++) {
+          let item = {
+            title: data.data[i]._id,
+            info: "Registered Users: " + data.data[i].distinctUsers
+          };
+
+          this.items.push(item);
+        }
+      }
+    },
+    async getLongestHistoryArticle() {
+      this.items = [];
+      this.loading = true;
+      const data = await this.$axios.$get("revisions/getOldestArticle", {
+        headers: {
+          "x-access-token": this.$store.state.user.authUser.data.token
+        },
+        params: {
+          limit: 2
+        }
+      });
+
+      if (data) {
+        this.loading = false;
+        for (var i = 0; i < data.data.length; i++) {
+          let item = {
+            title: data.data[i]._id,
+            info:
+              "Age: " +
+              Math.floor(data.data[i].age / (1000 * 60 * 60 * 24)) +
+              " days"
+          };
+
+          this.items.push(item);
+        }
+      }
+    },
+    async getYoungestHistoryArticle() {
+      this.items = [];
+      this.loading = true;
+      const data = await this.$axios.$get("revisions/getYoungestArticle", {
+        headers: {
+          "x-access-token": this.$store.state.user.authUser.data.token
+        },
+        params: {
+          limit: 1
+        }
+      });
+
+      if (data) {
+        this.loading = false;
+        for (var i = 0; i < data.data.length; i++) {
+          let item = {
+            title: data.data[i]._id,
+            info:
+              "Age: " +
+              Math.floor(data.data[i].age / (1000 * 60 * 60 * 24)) +
+              " days"
+          };
+
+          this.items.push(item);
+        }
+      }
     }
   },
   created() {
-    if (this.objectType === "hirev") {
-      this.getHighestRevisionArticles();
-    } else {
-      this.getLowestRevisionArticles();
+    switch (this.objectType) {
+      case "hirev":
+        this.getHighestRevisionArticles();
+        break;
+      case "lorev":
+        this.getLowestRevisionArticles();
+        break;
+    }
+  },
+  mounted() {
+    switch (this.objectType) {
+      case "hiuser":
+        this.getMostRegisteredUserArticle();
+        break;
+      case "louser":
+        this.getLeastRegisteredUserArticle();
+        break;
+      case "oldest":
+        this.getLongestHistoryArticle();
+        break;
+      case "youngest":
+        this.getYoungestHistoryArticle();
+        break;
     }
   },
   watch: {
     counter: function(value) {
-      if (value != "") {
+      if (/^\d+$/.test(value)) {
         //console.log(value);
-        if (this.objectType === "hirev") {
-          this.getHighestRevisionArticles();
-        } else {
-          this.getLowestRevisionArticles();
+        switch (this.objectType) {
+          case "hirev":
+            this.getHighestRevisionArticles();
+            break;
+          case "lorev":
+            this.getLowestRevisionArticles();
+            break;
         }
       }
     }
