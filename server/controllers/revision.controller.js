@@ -282,9 +282,11 @@ module.exports = {
       var userAdminInactive = contents[2].toString().split("\r\n");
       var userAdminSemi = contents[3].toString().split("\r\n");
       var userAdminFormer = contents[4].toString().split("\r\n");
-      var allAdmins = userAdminActive + userAdminInactive + userAdminSemi + userAdminFormer;
+      var allAdmins = userAdminActive.concat(userAdminInactive.concat(userAdminSemi.concat(userAdminFormer)));
 
-      var botResult = await revisionModel.aggregate([
+      async.parallel({
+      bot: function(cb) {
+        revisionModel.aggregate([
         {
           $project: {
             title: "$title",
@@ -301,13 +303,133 @@ module.exports = {
         {
           $group: {
             _id: "$year",
-            revisions: { $sum: 1 }
+            bot_revisions: { $sum: 1 }
           }
         }
-      ]);
+      ], function(err, results) { 
+        if (err) {
+          cb(err); 
+        } else { 
+          cb(null, results);
+        }
+      });
+    }, 
+    
+    admin: function(cb) {
+      revisionModel.aggregate([
+        {
+          $project: {
+            title: "$title",
+            user: "$user",
+            anon: "$anon",
+            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+          }
+        },
+        {
+          $match: {
+            user: { $in: allAdmins }
+          }
+        },
+        {
+          $group: {
+            _id: "$year",
+            admin_revisions: { $sum: 1 }
+          }
+        }
+      ], function(err, results) { 
+        if (err) {
+          cb(err); 
+        } else { 
+          cb(null, results);
+        }
+      });
+    }, 
 
-      response.json({ status: "success", message: "got stuff", data: botResult });
+    anon: function(cb) {
+      revisionModel.aggregate([
+        {
+          $project: {
+            title: "$title",
+            user: "$user",
+            anon: "$anon",
+            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+          }
+        },
+        {
+          $match: {
+            anon: { $exists: true }
+          }
+        },
+        {
+          $group: {
+            _id: "$year",
+            anon_revisions: { $sum: 1 }
+          }
+        }
+      ], function(err, results) { 
+        if (err) {
+          cb(err); 
+        } else { 
+          cb(null, results);
+        }
+      });
+    },
+
+    regular: function(cb) {
+      revisionModel.aggregate([
+        {
+          $project: {
+            title: "$title",
+            user: "$user",
+            anon: "$anon",
+            year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+          }
+        },
+        {
+          $match: {
+            $and: [
+              {user: {$nin: allAdmins}}, 
+              {user: {$nin: userBots}},
+              {anon: {$exists: false}}
+            ] 
+          }
+        },
+        {
+          $group: {
+            _id: "$year",
+            reg_revisions: { $sum: 1 }
+          }
+        }
+      ], function(err, results) { 
+        if (err) {
+          cb(err); 
+        } else { 
+          cb(null, results);
+        }
+      });
+    }
+
+    }, 
+
+    function(err, results) { 
+      if (err) { 
+        response.json({ status: "error", message: "didn't get stuff", data: err });
+        next(); 
+      } else { 
+        json1 = results.admin;
+        json2 = results.bot; 
+        json3 = results.anon; 
+        json4 = results.regular; 
+
+        mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
+        mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
+        mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
+
+        response.json({ status: "success", message: "got stuff", data: mapped_res });
+        next(); 
+      }
     });
+  })
   },
 
   displaySummaryInformation: async (request, response, next) => {
