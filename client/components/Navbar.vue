@@ -7,11 +7,13 @@
       </v-layout>
     </nuxt-link>
     <v-spacer/>
-    <template v-if="isAuthenticated && loggedInUser">
-      <v-btn class="white--text" flat to="/overview">Overview</v-btn>
-      <v-btn class="white--text" flat to="/article">Individual Article</v-btn>
-      <v-btn class="white--text" flat to="/author">Author</v-btn>
-    </template>
+    <v-toolbar-items>
+      <template v-if="isAuthenticated && loggedInUser">
+        <v-btn active-class="btnActive" class="white--text" flat to="/overview">Overview</v-btn>
+        <v-btn active-class="btnActive" class="white--text" flat to="/article">Individual Article</v-btn>
+        <v-btn active-class="btnActive" class="white--text" flat to="/author">Author</v-btn>
+      </template>
+    </v-toolbar-items>
     <v-spacer/>
     <v-toolbar-items>
       <v-tooltip bottom v-if="isAuthenticated && loggedInUser">
@@ -25,8 +27,8 @@
       </v-tooltip>
 
       <template v-if="!isAuthenticated || !loggedInUser">
-        <v-btn class="white--text" flat to="/register">Register</v-btn>
-        <v-btn class="white--text" flat to="/login">Login</v-btn>
+        <v-btn active-class="btnActive" class="white--text" flat to="/register">Register</v-btn>
+        <v-btn active-class="btnActive" class="white--text" flat to="/login">Login</v-btn>
       </template>
     </v-toolbar-items>
   </v-toolbar>
@@ -60,5 +62,9 @@ export default {
   text-decoration: none;
   text-decoration-color: none;
   color: black;
+}
+.btnActive {
+  background-color: aliceblue;
+  color: black !important;
 }
 </style>
