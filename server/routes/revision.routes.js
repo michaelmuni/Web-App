@@ -44,5 +44,10 @@ router.get("/oldestRevision", revisionController.getOldestRevision);
 
 //AUTHOR ANALYTICS 
 
+//fetches all articles which given author has contributed to 
+router.get("/getArticlesByAuthor", revisionController.getArticlesByAuthor); 
+//fetches timestamps of revisions made to specified article by specified author
+router.get("/trackArticleRevsByAuthor", revisionController.trackArticleRevisionsByAuthor); 
+
 
 module.exports = router;

@@ -1061,5 +1061,50 @@ module.exports = {
         }
       );
     });
+  }, 
+
+  getArticlesByAuthor: async (request, response, next) => {
+    
+    reqAuthor = request.query.author; 
+
+    var RevisionsByAuthorPipeline = [
+      { $match: { user: reqAuthor }},
+      { $group: { _id: "$title", no_revisions: { $sum: 1 } } },
+      { $sort: { no_revisions: -1 } }
+    ];
+
+    await revisionModel.aggregate(RevisionsByAuthorPipeline, function(err, result) {
+      if (err) {
+        response.json({ status: "error", message: "Couldn't fetch articles revised by " + reqAuthor, data: null });
+
+        next();
+      } else {
+        response.json({ status: "success", message: "Fetched articles revised by author " + reqAuthor, data: result });
+
+        next();
+      }
+    });
+
+  }, 
+
+  trackArticleRevisionsByAuthor: async (request, response, next) => {
+    reqAuthor = request.query.author; 
+    reqTitle = request.query.title; 
+
+    await revisionModel
+      .find({ title: reqTitle, user: reqAuthor }, {title: 1, user: 1, timestamp: 1, _id: 0})
+      .exec(function(err, result) {
+        if (err) {
+          response.json({ status: "error", message: "Could not retrieve timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: null });
+
+          next();
+          //log results to json response if successful
+        } else {
+          response.json({ status: "success", message: "Retrieved timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: result });
+
+          next();
+        }
+      });
+
   }
 };
