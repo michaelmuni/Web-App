@@ -9,6 +9,10 @@
 
 <script>
 export default {
-  components: {}
-}
+  middleware: "guest",
+  components: {},
+  beforeCreate() {
+    this.$store.dispatch("user/initializeStore");
+  }
+};
 </script>

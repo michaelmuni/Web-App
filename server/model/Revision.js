@@ -52,5 +52,6 @@ const RevisionSchema = new Schema({
 });
 
 RevisionSchema.index({ title: 1, timestamp: -1 });
+//RevisionSchema.index({ title: 1, timestamp: 1 });
 
 module.exports = mongoose.model("Revision", RevisionSchema, "revisions");

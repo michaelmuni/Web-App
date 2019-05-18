@@ -10,6 +10,7 @@
 import Login from "~/components/Login.vue";
 
 export default {
+  middleware: "guest",
   components: {
     Login
   }

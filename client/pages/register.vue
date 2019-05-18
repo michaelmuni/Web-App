@@ -10,6 +10,7 @@
 import Registration from "~/components/Registration.vue";
 
 export default {
+  middleware: "guest",
   components: {
     Registration
   }
