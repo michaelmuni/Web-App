@@ -4,7 +4,7 @@
       <h4 class="overflow-hidden">Yearly revision number distribution</h4>
     </v-card-title>-->
     <v-card-text>
-      <canvas id="fooCanvas" count="4"/>
+      <canvas id="BarCanvas" ref="bar" count="4"/>
       <!-- <chartjs-bar
         v-for="(item, index) in types"
         v-bind:key="index"
@@ -24,7 +24,7 @@
         :backgroundcolor="types[0].backgroundColor"
         :bordercolor="types[0].borderColor"
         :bind="true"
-        target="fooCanvas"
+        target="BarCanvas"
       ></chartjs-bar>
       <chartjs-bar
         :labels="labels"
@@ -33,7 +33,7 @@
         :backgroundcolor="types[1].backgroundColor"
         :bordercolor="types[1].borderColor"
         :bind="true"
-        target="fooCanvas"
+        target="BarCanvas"
       ></chartjs-bar>
       <chartjs-bar
         :labels="labels"
@@ -42,7 +42,7 @@
         :backgroundcolor="types[2].backgroundColor"
         :bordercolor="types[2].borderColor"
         :bind="true"
-        target="fooCanvas"
+        target="BarCanvas"
       ></chartjs-bar>
       <chartjs-bar
         :labels="labels"
@@ -51,7 +51,7 @@
         :backgroundcolor="types[3].backgroundColor"
         :bordercolor="types[3].borderColor"
         :bind="true"
-        target="fooCanvas"
+        target="BarCanvas"
       ></chartjs-bar>
     </v-card-text>
   </v-card>
@@ -61,6 +61,7 @@
 export default {
   data: () => ({
     beginZero: true,
+    loaded: false,
     labels: [],
     types: [
       {
@@ -95,43 +96,52 @@ export default {
   }),
   methods: {
     async getOverallYearRevisionDist() {
-      const data = await this.$axios.$get(
-        "revisions/getRevisionDistributionByYearUser",
-        {
-          headers: {
-            "x-access-token": this.$store.state.user.authUser.data.token
+      if (!this.loaded) {
+        const data = await this.$axios.$get(
+          "revisions/getRevisionDistributionByYearUser",
+          {
+            headers: {
+              "x-access-token": this.$store.state.user.authUser.data.token
+            }
           }
+        );
+
+        let ctx = this.$refs.bar.getContext("2d");
+        ctx.clearRect(this.x1, this.x2, this.x2 - this.x1, this.y2 - this.y1);
+        //console.log(data);
+
+        for (var i = 0; i < data.data.length; i++) {
+          //console.log(data.data[i]);
+          this.labels.push(data.data[i]._id);
+
+          data.data[i].admin_revisions
+            ? this.types[0].data.push(parseInt(data.data[i].admin_revisions))
+            : this.types[0].data.push(0);
+          data.data[i].bot_revisions
+            ? this.types[2].data.push(parseInt(data.data[i].bot_revisions))
+            : this.types[2].data.push(0);
+          data.data[i].anon_revisions
+            ? this.types[1].data.push(parseInt(data.data[i].anon_revisions))
+            : this.types[1].data.push(0);
+          data.data[i].reg_revisions
+            ? this.types[3].data.push(parseInt(data.data[i].reg_revisions))
+            : this.types[3].data.push(0);
+
+          //console.log(this.types[0]);
+          //console.log(this.types[1]);
         }
-      );
 
-      //console.log(data);
-      this.labels = [];
-
-      for (var i = 0; i < data.data.length; i++) {
-        //console.log(data.data[i]);
-        this.labels.push(data.data[i]._id);
-
-        data.data[i].admin_revisions
-          ? this.types[0].data.push(parseInt(data.data[i].admin_revisions))
-          : this.types[0].data.push(0);
-        data.data[i].bot_revisions
-          ? this.types[2].data.push(parseInt(data.data[i].bot_revisions))
-          : this.types[2].data.push(0);
-        data.data[i].anon_revisions
-          ? this.types[1].data.push(parseInt(data.data[i].anon_revisions))
-          : this.types[1].data.push(0);
-        data.data[i].reg_revisions
-          ? this.types[3].data.push(parseInt(data.data[i].reg_revisions))
-          : this.types[3].data.push(0);
-
-        //console.log(this.types[0]);
-        //console.log(this.types[1]);
+        this.$emit("loaded", true);
+        this.loaded = true;
       }
-
-      this.$emit("loaded", true);
     }
   },
-  mounted() {
+  created() {
+    this.labels = [];
+    this.types[0].data = [];
+    this.types[1].data = [];
+    this.types[2].data = [];
+    this.types[3].data = [];
     this.getOverallYearRevisionDist();
   }
 };

@@ -21,7 +21,9 @@
         <HorizontalCards objectType="youngest" objectHeader="Article with Shortest History" :counter="counter"/>
       </v-layout>
       <!-- <BarChart/> -->
-      <ChartContainer/>
+      <keep-alive>
+        <ChartContainer/>
+      </keep-alive>
     </v-layout>
   </v-layout>
 </template>
