@@ -80,8 +80,6 @@ export default {
       }
 
       this.$emit("loaded", true);
-
-      console.log(this.xdatasets);
     }
   },
   created() {

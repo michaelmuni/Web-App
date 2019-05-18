@@ -64,7 +64,8 @@ export default {
   color: black;
 }
 .btnActive {
-  background-color: aliceblue;
+  background-color: white;
   color: black !important;
+  box-shadow: none !important;
 }
 </style>
