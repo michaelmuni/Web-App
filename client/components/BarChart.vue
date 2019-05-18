@@ -1,8 +1,8 @@
 <template>
-  <v-card>
-    <v-card-title primary-title class="primary white--text">
+  <v-card class="elevation-0">
+    <!-- <v-card-title primary-title class="primary white--text">
       <h4 class="overflow-hidden">Yearly revision number distribution</h4>
-    </v-card-title>
+    </v-card-title>-->
     <v-card-text>
       <canvas id="fooCanvas" count="4"/>
       <!-- <chartjs-bar
@@ -127,6 +127,8 @@ export default {
         //console.log(this.types[0]);
         //console.log(this.types[1]);
       }
+
+      this.$emit("loaded", true);
     }
   },
   mounted() {
