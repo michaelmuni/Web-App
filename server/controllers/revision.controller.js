@@ -42,19 +42,36 @@ module.exports = {
 
   //get list of unique titles in the revisions collection
   getUniqueTitles: async (request, response, next) => {
-    await revisionModel.distinct("title", function(err, result) {
-      //log error to json response if one occurs
-      if (err) {
-        response.json({ status: "error", message: "Could not retrieve titles", data: null });
+    await revisionModel.aggregate(
+      [
+        {
+          $group: {
+            _id: "$title",
+            revisions: {
+              $sum: 1
+            }
+          }
+        },
+        {
+          $sort: {
+            _id: 1
+          }
+        }
+      ],
+      function(err, result) {
+        //log error to json response if one occurs
+        if (err) {
+          response.json({ status: "error", message: "Could not retrieve titles", data: null });
 
-        next();
-        //log results to json response if successful
-      } else {
-        response.json({ status: "success", message: "Fetched list of titles", data: result });
+          next();
+          //log results to json response if successful
+        } else {
+          response.json({ status: "success", message: "Fetched list of titles", data: result });
 
-        next();
+          next();
+        }
       }
-    });
+    );
   },
 
   //for a given title, find the latest revision done to that article
