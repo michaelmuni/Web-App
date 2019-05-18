@@ -52,8 +52,8 @@ export const actions = {
       this.replaceState(
         Object.assign(state, JSON.parse(localStorage.getItem("store")))
       );
-
-      this.$router.push("/overview");
+    } else {
+      this.$router.push("/");
     }
   }
 };
