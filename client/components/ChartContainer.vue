@@ -5,16 +5,17 @@
       <v-divider></v-divider>
       <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
     </v-stepper-header>
+    <v-progress-linear height="2" v-model="value" :active="show" :indeterminate="query" :query="true"></v-progress-linear>
     <v-stepper-items>
       <v-stepper-content step="1">
         <v-layout fill-height column>
-          <BarChart/>
+          <BarChart @loaded="progress"/>
           <v-btn color="primary" @click="e1 = 2">Next</v-btn>
         </v-layout>
       </v-stepper-content>
       <v-stepper-content step="2">
         <v-layout fill-height column>
-          <PieChart/>
+          <PieChart @loaded="progress"/>
           <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
         </v-layout>
       </v-stepper-content>
@@ -34,7 +35,11 @@ export default {
   data: () => ({
     e1: 0,
     steps: 2,
-    n: 1
+    n: 1,
+    value: 0,
+    query: true,
+    show: true,
+    interval: 0
   }),
   methods: {
     nextStep() {
@@ -43,12 +48,23 @@ export default {
       } else {
         this.e1 = this.n + 1;
       }
+    },
+    progress(status) {
+      if (status) {
+        this.value += 50;
+      }
     }
   },
   watch: {
     steps(val) {
       if (this.e1 > val) {
         this.e1 = val;
+      }
+    },
+    value(val) {
+      if (val == 100) {
+        this.show = false;
+        this.query = false;
       }
     }
   }

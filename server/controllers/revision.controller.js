@@ -390,7 +390,7 @@ module.exports = {
                 {
                   $group: {
                     _id: "Regular User",
-                    regular_revisions: {
+                    reg_revisions: {
                       $sum: 1
                     }
                   }
@@ -704,8 +704,7 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, 
-                    {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
                   }
                 },
                 {
@@ -740,8 +739,7 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, 
-                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
                   }
                 },
                 {
@@ -776,8 +774,7 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, 
-                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
                   }
                 },
                 {
@@ -812,8 +809,7 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } },
-                      { title: reqTitle }, {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
                   }
                 },
                 {
@@ -891,14 +887,14 @@ module.exports = {
                     title: "$title",
                     user: "$user",
                     anon: "$anon",
-                    timestamp: "$timestamp", 
+                    timestamp: "$timestamp",
                     year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
                   }
                 },
                 {
                   $match: {
-                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, 
-                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
+                  }
                 },
                 {
                   $group: {
@@ -936,8 +932,7 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, 
-                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
                   }
                 },
                 {
@@ -976,8 +971,8 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, 
-                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
+                  }
                 },
                 {
                   $group: {
@@ -1015,8 +1010,8 @@ module.exports = {
                 },
                 {
                   $match: {
-                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } },
-                      { title: reqTitle }, {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }, { title: reqTitle }, { timestamp: { $gte: stringFrom, $lte: stringTo } }]
+                  }
                 },
                 {
                   $group: {
@@ -1061,17 +1056,12 @@ module.exports = {
         }
       );
     });
-  }, 
+  },
 
   getArticlesByAuthor: async (request, response, next) => {
-    
-    reqAuthor = request.query.author; 
+    reqAuthor = request.query.author;
 
-    var RevisionsByAuthorPipeline = [
-      { $match: { user: reqAuthor }},
-      { $group: { _id: "$title", no_revisions: { $sum: 1 } } },
-      { $sort: { no_revisions: -1 } }
-    ];
+    var RevisionsByAuthorPipeline = [{ $match: { user: reqAuthor } }, { $group: { _id: "$title", no_revisions: { $sum: 1 } } }, { $sort: { no_revisions: -1 } }];
 
     await revisionModel.aggregate(RevisionsByAuthorPipeline, function(err, result) {
       if (err) {
@@ -1084,27 +1074,23 @@ module.exports = {
         next();
       }
     });
-
-  }, 
+  },
 
   trackArticleRevisionsByAuthor: async (request, response, next) => {
-    reqAuthor = request.query.author; 
-    reqTitle = request.query.title; 
+    reqAuthor = request.query.author;
+    reqTitle = request.query.title;
 
-    await revisionModel
-      .find({ title: reqTitle, user: reqAuthor }, {title: 1, user: 1, timestamp: 1, _id: 0})
-      .exec(function(err, result) {
-        if (err) {
-          response.json({ status: "error", message: "Could not retrieve timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: null });
+    await revisionModel.find({ title: reqTitle, user: reqAuthor }, { title: 1, user: 1, timestamp: 1, _id: 0 }).exec(function(err, result) {
+      if (err) {
+        response.json({ status: "error", message: "Could not retrieve timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: null });
 
-          next();
-          //log results to json response if successful
-        } else {
-          response.json({ status: "success", message: "Retrieved timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: result });
+        next();
+        //log results to json response if successful
+      } else {
+        response.json({ status: "success", message: "Retrieved timestamps for revisions by author " + reqAuthor + " to article " + reqTitle, data: result });
 
-          next();
-        }
-      });
-
+        next();
+      }
+    });
   }
 };
