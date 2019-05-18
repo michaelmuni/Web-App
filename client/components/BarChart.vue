@@ -1,58 +1,7 @@
 <template>
   <v-card class="elevation-0">
-    <!-- <v-card-title primary-title class="primary white--text">
-      <h4 class="overflow-hidden">Yearly revision number distribution</h4>
-    </v-card-title>-->
-    <v-card-text>
-      <canvas id="BarCanvas" ref="bar" count="4"/>
-      <!-- <chartjs-bar
-        v-for="(item, index) in types"
-        v-bind:key="index"
-        v-bind:backgroundcolor="item.bgColor"
-        v-bind:beginzero="beginZero"
-        v-bind:bind="true"
-        v-bind:bordercolor="item.borderColor"
-        v-bind:data="item.data"
-        v-bind:datalabel="item.dataLabel"
-        v-bind:labels="labels"
-        target="fooCanvas"
-      />-->
-      <chartjs-bar
-        :labels="labels"
-        :datalabel="types[0].label"
-        :data="types[0].data"
-        :backgroundcolor="types[0].backgroundColor"
-        :bordercolor="types[0].borderColor"
-        :bind="true"
-        target="BarCanvas"
-      ></chartjs-bar>
-      <chartjs-bar
-        :labels="labels"
-        :datalabel="types[1].label"
-        :data="types[1].data"
-        :backgroundcolor="types[1].backgroundColor"
-        :bordercolor="types[1].borderColor"
-        :bind="true"
-        target="BarCanvas"
-      ></chartjs-bar>
-      <chartjs-bar
-        :labels="labels"
-        :datalabel="types[2].label"
-        :data="types[2].data"
-        :backgroundcolor="types[2].backgroundColor"
-        :bordercolor="types[2].borderColor"
-        :bind="true"
-        target="BarCanvas"
-      ></chartjs-bar>
-      <chartjs-bar
-        :labels="labels"
-        :datalabel="types[3].label"
-        :data="types[3].data"
-        :backgroundcolor="types[3].backgroundColor"
-        :bordercolor="types[3].borderColor"
-        :bind="true"
-        target="BarCanvas"
-      ></chartjs-bar>
+    <v-card-text ref="ccontainer">
+      <chartjs-bar :labels="xlabels" :datasets="xdatasets" :bind="true"></chartjs-bar>
     </v-card-text>
   </v-card>
 </template>
@@ -60,88 +9,82 @@
 <script>
 export default {
   data: () => ({
-    beginZero: true,
-    loaded: false,
-    labels: [],
-    types: [
+    xlabels: [],
+    xdatasets: [
       {
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        borderColor: "rgba(255,99,132,1)",
-        borderWidth: 1,
         label: "Administrator",
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1,
         data: []
       },
       {
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
         label: "Anonymous",
-        data: []
-      },
-      {
-        backgroundColor: "rgba(255, 206, 86, 0.2)",
-        borderColor: "rgba(255, 206, 86, 1)",
+        backgroundColor: [],
+        borderColor: [],
         borderWidth: 1,
-        label: "Bot",
         data: []
       },
       {
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        label: "Bot",
+        backgroundColor: [],
+        borderColor: [],
+        borderWidth: 1,
+        data: []
+      },
+      {
         label: "Regular User",
+        backgroundColor: [],
+        borderColor: [],
         borderWidth: 1,
         data: []
       }
-    ]
+    ],
+    beginZero: true,
+    loaded: false
   }),
   methods: {
     async getOverallYearRevisionDist() {
-      if (!this.loaded) {
-        const data = await this.$axios.$get(
-          "revisions/getRevisionDistributionByYearUser",
-          {
-            headers: {
-              "x-access-token": this.$store.state.user.authUser.data.token
-            }
+      const data = await this.$axios.$get(
+        "revisions/getRevisionDistributionByYearUser",
+        {
+          headers: {
+            "x-access-token": this.$store.state.user.authUser.data.token
           }
-        );
-
-        let ctx = this.$refs.bar.getContext("2d");
-        ctx.clearRect(this.x1, this.x2, this.x2 - this.x1, this.y2 - this.y1);
-        //console.log(data);
-
-        for (var i = 0; i < data.data.length; i++) {
-          //console.log(data.data[i]);
-          this.labels.push(data.data[i]._id);
-
-          data.data[i].admin_revisions
-            ? this.types[0].data.push(parseInt(data.data[i].admin_revisions))
-            : this.types[0].data.push(0);
-          data.data[i].bot_revisions
-            ? this.types[2].data.push(parseInt(data.data[i].bot_revisions))
-            : this.types[2].data.push(0);
-          data.data[i].anon_revisions
-            ? this.types[1].data.push(parseInt(data.data[i].anon_revisions))
-            : this.types[1].data.push(0);
-          data.data[i].reg_revisions
-            ? this.types[3].data.push(parseInt(data.data[i].reg_revisions))
-            : this.types[3].data.push(0);
-
-          //console.log(this.types[0]);
-          //console.log(this.types[1]);
         }
+      );
 
-        this.$emit("loaded", true);
-        this.loaded = true;
+      for (var i = 0; i < data.data.length; i++) {
+        this.xlabels.push(data.data[i]._id);
+
+        if (data.data[i].admin_revisions) {
+          this.xdatasets[0].backgroundColor.push("rgba(255, 99, 132, 0.2)");
+          this.xdatasets[0].borderColor.push("rgba(255, 99, 132, 1)");
+          this.xdatasets[0].data.push(data.data[i].admin_revisions);
+        }
+        if (data.data[i].anon_revisions) {
+          this.xdatasets[1].backgroundColor.push("rgba(54, 162, 235, 0.2)");
+          this.xdatasets[1].borderColor.push("rgba(54, 162, 235, 1)");
+          this.xdatasets[1].data.push(data.data[i].anon_revisions);
+        }
+        if (data.data[i].bot_revisions) {
+          this.xdatasets[2].backgroundColor.push("rgba(255, 206, 86, 0.2)");
+          this.xdatasets[2].borderColor.push("rgba(255, 206, 86, 1)");
+          this.xdatasets[2].data.push(data.data[i].bot_revisions);
+        }
+        if (data.data[i].reg_revisions) {
+          this.xdatasets[3].backgroundColor.push("rgba(75, 192, 192, 0.2)");
+          this.xdatasets[3].borderColor.push("rgba(75, 192, 192, 1)");
+          this.xdatasets[3].data.push(data.data[i].reg_revisions);
+        }
       }
+
+      this.$emit("loaded", true);
+
+      console.log(this.xdatasets);
     }
   },
   created() {
-    this.labels = [];
-    this.types[0].data = [];
-    this.types[1].data = [];
-    this.types[2].data = [];
-    this.types[3].data = [];
     this.getOverallYearRevisionDist();
   }
 };
