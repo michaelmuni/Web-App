@@ -1,6 +1,20 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout column>
+  <!-- <v-container grid-list-md text-xs-center> -->
+  <v-card width="100%">
+    <v-card-title class="font-weight-bold">
+      <h2>{{ objectHeader }}</h2>
+    </v-card-title>
+    <v-card-text>
+      <v-layout wrap row>
+        <div class="loader" v-if="loading">
+          <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
+        </div>
+        <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
+      </v-layout>
+    </v-card-text>
+  </v-card>
+
+  <!-- <v-layout column>
       <v-layout align-center row>
         <h2 class="pb-1">{{ objectHeader }}</h2>
       </v-layout>
@@ -12,8 +26,8 @@
           <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
         </div>
       </v-layout>
-    </v-layout>
-  </v-container>
+  </v-layout>-->
+  <!-- </v-container> -->
 </template>
 
 <script>

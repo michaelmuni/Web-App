@@ -1,9 +1,9 @@
 <template>
   <v-stepper v-model="e1">
     <v-stepper-header>
-      <v-stepper-step :complete="e1 > 1" step="1">Yearly Revision Distribution by User Types</v-stepper-step>
+      <v-stepper-step step="1">Yearly Revision Distribution by User Types</v-stepper-step>
       <v-divider></v-divider>
-      <v-stepper-step :complete="e1 > 2" step="2">Revision Number Distribution by User Type</v-stepper-step>
+      <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
     </v-stepper-header>
     <v-stepper-items>
       <v-stepper-content step="1">
@@ -14,7 +14,7 @@
       </v-stepper-content>
       <v-stepper-content step="2">
         <v-layout fill-height column>
-          <h1>YOLO</h1>
+          <PieChart/>
           <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
         </v-layout>
       </v-stepper-content>
@@ -24,10 +24,12 @@
 
 <script>
 import BarChart from "~/components/BarChart.vue";
+import PieChart from "~/components/PieChart.vue";
 
 export default {
   components: {
-    BarChart
+    BarChart,
+    PieChart
   },
   data: () => ({
     e1: 0,

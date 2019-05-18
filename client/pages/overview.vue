@@ -7,12 +7,15 @@
     <v-layout column>
       <v-flex>
         <HorizontalCards objectType="hirev" objectHeader="Articles with Highest Revisions" :counter="counter" @loading="loadingData"/>
+        <v-divider></v-divider>
         <HorizontalCards objectType="lorev" objectHeader="Articles with Lowest Revisions" :counter="counter" @loading="loadingData"/>
       </v-flex>
+      <v-divider></v-divider>
       <v-layout row>
         <HorizontalCards objectType="hiuser" objectHeader="Article with Most Registered Users" :counter="counter"/>
         <HorizontalCards objectType="louser" objectHeader="Article with Least Registered Users" :counter="counter"/>
       </v-layout>
+      <v-divider></v-divider>
       <v-layout row>
         <HorizontalCards objectType="oldest" objectHeader="Articles with Longest History" :counter="counter"/>
         <HorizontalCards objectType="youngest" objectHeader="Article with Shortest History" :counter="counter"/>
