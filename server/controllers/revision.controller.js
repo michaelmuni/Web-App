@@ -673,102 +673,189 @@ module.exports = {
     }
 
     reqTitle = request.query.title;
+    reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
+    reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
 
-    await revisionModel.find({ title: reqTitle }, function(err, results) {
-      if (err) {
-        response.json({ status: "error", message: "Problem with getting revisions for " + reqTitle + " by user type", data: null });
+    stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
+    stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
 
-        next();
-      } else {
-        var bot_contents = "";
-        var admin_contents = "";
+    const files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
 
-        files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+    async.map(files, readAsync, async (error, contents) => {
+      var userBots = contents[0].toString().split("\r\n");
+      var userAdminActive = contents[1].toString().split("\r\n");
+      var userAdminInactive = contents[2].toString().split("\r\n");
+      var userAdminSemi = contents[3].toString().split("\r\n");
+      var userAdminFormer = contents[4].toString().split("\r\n");
+      var allAdmins = userAdminActive.concat(userAdminInactive.concat(userAdminSemi.concat(userAdminFormer)));
 
-        async.map(files, readAsync, function(err, contents) {
-          if (contents) {
-            bot_contents = contents[0].toString();
-            admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString();
-            userArticleCount = { anon: 0, bot: 0, admin: 0, regular: 0 };
-
-            for (var i = 0; i < results.length; i++) {
-              if (results[i].anon) {
-                userArticleCount["anon"] += 1;
-              } else if (admin_contents.includes(results[i].user)) {
-                userArticleCount["admin"] += 1;
-              } else if (bot_contents.includes(results[i].user)) {
-                userArticleCount["bot"] += 1;
-              } else {
-                userArticleCount["regular"] += 1;
+      async.parallel(
+        {
+          bot: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp"
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, 
+                    {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "Bot",
+                    bot_revisions: {
+                      $sum: 1
+                    }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
               }
-            }
+            );
+          },
 
-            response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type", data: userArticleCount });
+          admin: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp"
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, 
+                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "Administrator",
+                    admin_revisions: {
+                      $sum: 1
+                    }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
+
+          anon: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp"
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, 
+                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "Anonymous",
+                    anon_revisions: {
+                      $sum: 1
+                    }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
+
+          regular: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp"
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } },
+                      { title: reqTitle }, {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "Regular User",
+                    regular_revisions: {
+                      $sum: 1
+                    }
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          }
+        },
+
+        function(err, results) {
+          if (err) {
+            response.json({ status: "error", message: "didnt get article revisions by user type", data: err });
+            next();
+          } else {
+            json1 = results.admin;
+            json2 = results.bot;
+            json3 = results.anon;
+            json4 = results.regular;
+            // mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
+            // mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
+            // mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
+
+            data = json1.concat(json2.concat(json3.concat(json4)));
+
+            response.json({ status: "success", message: "got article revisions by user type", data: data });
             next();
           }
-        });
-      }
-    });
-  },
-
-  getRevsByUserTypeAndYear: async (request, response, next) => {
-    function readAsync(file, callback) {
-      fs.readFile(file, "utf8", callback);
-    }
-
-    function insertIntoDict(dict, year, usertype) {
-      if (dict[year]) {
-        if (dict[year][usertype]) {
-          dict[year][usertype] += 1;
-        } else {
-          dict[year][usertype] = 1;
         }
-      } else {
-        dict[year] = {};
-        dict[year][usertype] = 1;
-      }
-    }
-
-    await revisionModel.find({}, function(err, results) {
-      if (err) {
-        response.json({ status: "error", message: "Problem with getting revisions by user type and year", data: null });
-
-        next();
-      } else {
-        var bot_contents = "";
-        var admin_contents = "";
-
-        files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
-
-        async.map(files, readAsync, function(err, contents) {
-          if (contents) {
-            bot_contents = contents[0].toString();
-            admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString();
-            userArticleCount = {};
-
-            for (var i = 0; i < results.length; i++) {
-              year = new Date(results[i].timestamp).getFullYear();
-
-              if (results[i].anon) {
-                insertIntoDict(userArticleCount, year, "anon");
-              } else if (admin_contents.includes(results[i].user)) {
-                insertIntoDict(userArticleCount, year, "admin");
-              } else if (bot_contents.includes(results[i].user)) {
-                insertIntoDict(userArticleCount, year, "bot");
-              } else {
-                insertIntoDict(userArticleCount, year, "regular");
-              }
-            }
-
-            var output = Object.keys(userArticleCount).map(function(key) {
-              return { type: key, name: userArticleCount[key] };
-            });
-
-            response.json({ status: "success", message: "got breakdown of revisions by user type and year", data: output });
-            next();
-          }
-        });
-      }
+      );
     });
   },
 
@@ -777,63 +864,202 @@ module.exports = {
       fs.readFile(file, "utf8", callback);
     }
 
-    function insertIntoDict(dict, year, usertype) {
-      if (dict[year]) {
-        if (dict[year][usertype]) {
-          dict[year][usertype] += 1;
-        } else {
-          dict[year][usertype] = 1;
-        }
-      } else {
-        dict[year] = {};
-        dict[year][usertype] = 1;
-      }
-    }
+    const files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
 
     reqTitle = request.query.title;
+    reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
+    reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
 
-    await revisionModel.find({ title: reqTitle }, function(err, results) {
-      if (err) {
-        response.json({ status: "error", message: "Problem with getting revisions for " + reqTitle + " by user type and year", data: null });
+    stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
+    stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
 
-        next();
-      } else {
-        var bot_contents = "";
-        var admin_contents = "";
+    async.map(files, readAsync, async (error, contents) => {
+      var userBots = contents[0].toString().split("\r\n");
+      var userAdminActive = contents[1].toString().split("\r\n");
+      var userAdminInactive = contents[2].toString().split("\r\n");
+      var userAdminSemi = contents[3].toString().split("\r\n");
+      var userAdminFormer = contents[4].toString().split("\r\n");
+      var allAdmins = userAdminActive.concat(userAdminInactive.concat(userAdminSemi.concat(userAdminFormer)));
 
-        files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
-
-        async.map(files, readAsync, function(err, contents) {
-          if (contents) {
-            bot_contents = contents[0].toString();
-            admin_contents = contents[1].toString() + contents[2].toString() + contents[3].toString() + contents[4].toString();
-            userArticleCount = {};
-
-            for (var i = 0; i < results.length; i++) {
-              year = new Date(results[i].timestamp).getFullYear();
-
-              if (results[i].anon) {
-                insertIntoDict(userArticleCount, year, "anon");
-              } else if (admin_contents.includes(results[i].user)) {
-                insertIntoDict(userArticleCount, year, "admin");
-              } else if (bot_contents.includes(results[i].user)) {
-                insertIntoDict(userArticleCount, year, "bot");
-              } else {
-                insertIntoDict(userArticleCount, year, "regular");
+      async.parallel(
+        {
+          bot: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp", 
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $in: userBots } }, { title: reqTitle }, 
+                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    bot_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
               }
-            }
+            );
+          },
 
-            var output = Object.keys(userArticleCount).map(function(key) {
-              return { type: key, name: userArticleCount[key] };
-            });
+          admin: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $in: allAdmins } }, { title: reqTitle }, 
+                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]
+                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    admin_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
 
-            // display the result
+          anon: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ anon: { $exists: true } }, { title: reqTitle }, 
+                      {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    anon_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          },
 
-            response.json({ status: "success", message: "got breakdown of revisions for " + reqTitle + " by user type and year", data: output });
+          regular: function(cb) {
+            revisionModel.aggregate(
+              [
+                {
+                  $project: {
+                    title: "$title",
+                    user: "$user",
+                    anon: "$anon",
+                    timestamp: "$timestamp",
+                    year: { $year: { $dateFromString: { dateString: "$timestamp" } } }
+                  }
+                },
+                {
+                  $match: {
+                    $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } },
+                      { title: reqTitle }, {timestamp: {$gte: stringFrom, $lte: stringTo}}]                  }
+                },
+                {
+                  $group: {
+                    _id: "$year",
+                    reg_revisions: { $sum: 1 }
+                  }
+                },
+                {
+                  $sort: {
+                    _id: 1
+                  }
+                }
+              ],
+              function(err, results) {
+                if (err) {
+                  cb(err);
+                } else {
+                  cb(null, results);
+                }
+              }
+            );
+          }
+        },
+
+        function(err, results) {
+          if (err) {
+            response.json({ status: "error", message: "failed to get article revisions by user type and year", data: err });
+            next();
+          } else {
+            json1 = results.admin;
+            json2 = results.bot;
+            json3 = results.anon;
+            json4 = results.regular;
+
+            mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
+            mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
+            mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
+
+            response.json({ status: "success", message: "got article revisions by user type and year", data: mapped_res });
             next();
           }
-        });
-      }
+        }
+      );
     });
   }
 };

@@ -24,8 +24,7 @@ router.get("/getYoungestArticle", revisionController.getYoungestArticle);
 router.get("/getRevisionsByUserType", revisionController.getRevisionsByUserType);
 //breaks down how many revisions were done by each user type for each given year
 router.get("/getRevisionDistributionByYearUser", revisionController.getRevisionDistributionByYearUser);
-//outdated query to do the same as the query directly above
-router.get("/getRevsByUserTypeAndYear", revisionController.getRevsByUserTypeAndYear);
+
 
 //INDIVIDUAL ANALYTICS
 
@@ -42,5 +41,8 @@ router.get("/countTitle", revisionController.countTitle);
 router.get("/latestRevision", revisionController.getLatestRevision);
 //fetches the earliest revision for a given article
 router.get("/oldestRevision", revisionController.getOldestRevision);
+
+//AUTHOR ANALYTICS 
+
 
 module.exports = router;
