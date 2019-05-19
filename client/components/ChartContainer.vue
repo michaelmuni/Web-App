@@ -10,14 +10,14 @@
       <v-stepper-items>
         <v-stepper-content step="1">
           <v-layout fill-height column>
-            <BarChart @loaded="progress"/>
-            <v-btn color="primary" @click="e1 = 2">Next</v-btn>
+            <BarChart @loaded="progress" :type="type"/>
+            <v-btn color="primary" @click="e1 = 2">Change</v-btn>
           </v-layout>
         </v-stepper-content>
         <v-stepper-content step="2">
           <v-layout fill-height column>
-            <PieChart @loaded="progress"/>
-            <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
+            <PieChart @loaded="progress" :type="type"/>
+            <v-btn color="primary" @click="e1 = 1">Change</v-btn>
           </v-layout>
         </v-stepper-content>
       </v-stepper-items>
@@ -27,19 +27,28 @@
         <v-stepper-step step="1">Yearly Revision Distribution by User Types</v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="3">Revision Number Distribution by User</v-stepper-step>
       </v-stepper-header>
       <v-progress-linear height="2" v-model="value" :active="show" :indeterminate="query" :query="true"></v-progress-linear>
       <v-stepper-items>
         <v-stepper-content step="1">
           <v-layout fill-height column>
-            <BarChart @loaded="progress"/>
-            <v-btn color="primary" @click="e1 = 2">Next</v-btn>
+            <BarChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 2">Change</v-btn>
           </v-layout>
         </v-stepper-content>
         <v-stepper-content step="2">
           <v-layout fill-height column>
-            <PieChart @loaded="progress"/>
-            <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
+            <PieChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 3">Change</v-btn>
+          </v-layout>
+        </v-stepper-content>
+        <v-stepper-content step="3">
+          <v-layout fill-height column>
+            <!-- <PieChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress"/> -->
+            <h1>PLACEHOLDER</h1>
+            <v-btn color="primary" @click="e1 = 1">Change</v-btn>
           </v-layout>
         </v-stepper-content>
       </v-stepper-items>
@@ -65,7 +74,7 @@ export default {
     show: true,
     interval: 0
   }),
-  props: ["type"],
+  props: ["type", "title", "yearFrom", "yearTo"],
   methods: {
     nextStep() {
       if (this.n === this.steps) {

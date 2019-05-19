@@ -21,7 +21,7 @@
         <HorizontalCards objectType="youngest" objectHeader="Article with Shortest History" :counter="counter"/>
       </v-layout>
       <keep-alive>
-        <ChartContainer/>
+        <ChartContainer type="overview"/>
       </keep-alive>
     </v-layout>
   </v-layout>
@@ -29,14 +29,12 @@
 
 <script>
 import HorizontalCards from "~/components/HorizontalCards.vue";
-import BarChart from "~/components/BarChart.vue";
 import ChartContainer from "~/components/ChartContainer";
 
 export default {
   middleware: "auth",
   components: {
     HorizontalCards,
-    BarChart,
     ChartContainer
   },
   data: () => ({
