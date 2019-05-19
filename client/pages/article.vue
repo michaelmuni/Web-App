@@ -1,8 +1,11 @@
 <template>
   <v-layout row>
-    <v-flex class="mr-5 mt-2" xs1>
-      <h4>PLACEHOLDER FOR YEAR INPUT</h4>
-      <v-text-field v-model="counter" :disabled="loading" label="Number" outline></v-text-field>
+    <v-flex class="mr-5 mt-2" sm2>
+      <v-layout column>
+        <h4 class="ml-2">Filter By Date</h4>
+        <DatePicker title="From"/>
+        <DatePicker title="To"/>
+      </v-layout>
     </v-flex>
     <v-container>
       <v-toolbar dark color="primary">
@@ -31,11 +34,13 @@
 
 <script>
 import ArticleContainer from "~/components/ArticleContainer.vue";
+import DatePicker from "~/components/DatePicker.vue";
 
 export default {
   middleware: ["auth"],
   components: {
-    ArticleContainer
+    ArticleContainer,
+    DatePicker
   },
   data: () => ({
     titles: [],
