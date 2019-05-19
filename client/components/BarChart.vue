@@ -117,37 +117,21 @@ export default {
       this.$emit("loaded", true);
     },
     async getIndividualYearRevisionDist() {
-      this.ylabels = [];
-      this.ydatasets = [
-        {
-          label: "Administrator",
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
-          data: []
-        },
-        {
-          label: "Anonymous",
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
-          data: []
-        },
-        {
-          label: "Bot",
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
-          data: []
-        },
-        {
-          label: "Regular User",
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
-          data: []
-        }
-      ];
+        this.ydatasets[0].data = [];
+        this.ydatasets[0].backgroundColor = [];
+        this.ydatasets[0].borderColor = [];
+
+        this.ydatasets[1].data = [];
+        this.ydatasets[1].backgroundColor = [];
+        this.ydatasets[1].borderColor = [];
+
+        this.ydatasets[2].data = [];
+        this.ydatasets[2].backgroundColor = [];
+        this.ydatasets[2].borderColor = [];
+
+        this.ydatasets[3].data = [];
+        this.ydatasets[3].backgroundColor = [];
+        this.ydatasets[0].borderColor = [];
 
       const data = await this.$axios.$get(
         "revisions/getArticleRevsByUserTypeAndYear",
@@ -157,8 +141,8 @@ export default {
           },
           params: {
             title: this.title,
-            fromyear: this.yFrom,
-            toyear: this.yTo
+            fromyear: this.yFrom ? this.yFrom : "1970-01-01",
+            toyear: this.yTo ? this.yTo : new Date().toISOString().substr(0, 10)
           }
         }
       );
@@ -194,23 +178,28 @@ export default {
   created() {
     if (this.type === "overview") {
       this.getOverallYearRevisionDist();
-    } else {
-      this.getIndividualYearRevisionDist();
+    } else { 
+      this.getIndividualYearRevisionDist(); 
     }
   },
   watch: {
     title: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
         this.getIndividualYearRevisionDist();
       }
     },
     yFrom: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
+
         this.getIndividualYearRevisionDist();
       }
     },
     yTo: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
+
         this.getIndividualYearRevisionDist();
       }
     }
