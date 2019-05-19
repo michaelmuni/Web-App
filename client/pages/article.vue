@@ -9,7 +9,7 @@
         <v-toolbar-title class="mr-4">
           <v-icon>search</v-icon>
         </v-toolbar-title>
-        <v-autocomplete class="mt-2" v-model="title" :hint="'Type to search'" :items="titles" :label="'Search...'" item-text flat solo-inverted>
+        <v-autocomplete class="mt-2" v-model="title" :hint="'Type to search'" :items="titles" :label="'Search...'" item-text="_id" item-value="_id" flat solo-inverted>
           <template v-slot:selection="titles">
             <v-list-tile-content>
               <v-list-tile-title v-html="titles.item._id"></v-list-tile-title>
