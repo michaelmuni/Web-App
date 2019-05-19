@@ -24,7 +24,7 @@
         </v-card-text>
       </v-card>
     </v-card-text>
-    <ChartContainer v-if="show" type="individual" :title="articleTitle" :yearFrom="yearFrom" :yearTo="yearTo"/>
+    <!-- <ChartContainer v-if="show" type="individual" :title="articleTitle" :yearFrom="yearFrom" :yearTo="yearTo"/> -->
   </v-card>
 </template>
 
@@ -43,10 +43,7 @@ export default {
   props: ["articleTitle", "yearFrom", "yearTo", "update"],
   methods: {
     async getArticleSummary() {
-      if (
-        this.articleTitle !== null &&
-        this.update === true
-      ) {
+      if (this.articleTitle !== null && this.update === true) {
         this.show = true;
         const data = await this.$axios.$get("revisions/displaySummaryInfo", {
           headers: {
@@ -59,7 +56,8 @@ export default {
           }
         });
 
-        this.revisionCount = data.data[0].Total.length == 1 ? data.data[0].Total[0].Total : 0;
+        this.revisionCount =
+          data.data[0].Total.length == 1 ? data.data[0].Total[0].Total : 0;
         this.regUsers = [];
 
         var topfivelength = data.data[0].TopFive.length;
@@ -69,7 +67,7 @@ export default {
         }
 
         for (var i = 0; i < 5 - topfivelength; i++) {
-          this.regUsers.push({"_id": "N/A", "usercount": 0});
+          this.regUsers.push({ _id: "N/A", usercount: 0 });
         }
 
         this.$emit("done", true);

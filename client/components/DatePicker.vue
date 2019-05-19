@@ -23,9 +23,9 @@ export default {
     save(date) {
       this.$refs.menu.save(date);
       this.$emit("picked", date);
-    }, 
+    },
     onClearClicked() {
-      this.$emit("cleared");  
+      this.$emit("cleared");
     }
   }
 };

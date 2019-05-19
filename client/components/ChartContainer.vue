@@ -34,13 +34,13 @@
       <v-stepper-items>
         <v-stepper-content step="1">
           <v-layout fill-height column>
-            <BarChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress"/>
+            <BarChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress" :change="update"/>
             <v-btn color="primary" @click="e1 = 2">Change</v-btn>
           </v-layout>
         </v-stepper-content>
         <v-stepper-content step="2">
           <v-layout fill-height column>
-            <PieChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress"/>
+            <PieChart :title="title" :yFrom="yearFrom" :yTo="yearTo" @loaded="progress" :change="update"/>
             <v-btn color="primary" @click="e1 = 3">Change</v-btn>
           </v-layout>
         </v-stepper-content>
@@ -74,7 +74,7 @@ export default {
     show: true,
     interval: 0
   }),
-  props: ["type", "title", "yearFrom", "yearTo"],
+  props: ["type", "title", "yearFrom", "yearTo", "update"],
   methods: {
     nextStep() {
       if (this.n === this.steps) {

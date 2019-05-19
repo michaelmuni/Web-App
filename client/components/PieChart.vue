@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  props: ["type", "title", "yFrom", "yTo"],
+  props: ["type", "title", "yFrom", "yTo", "change"],
   data: () => ({
     xlabels: [],
     xdatasets: [
@@ -80,24 +80,6 @@ export default {
       this.$emit("loaded", true);
     },
     async getIndividualRevisionsByUserType() {
-      this.ylabels = [];
-      this.ydatasets = [
-        {
-          data: [],
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.5)",
-            "rgba(54, 162, 235, 0.5)",
-            "rgba(255, 206, 86, 0.5)",
-            "rgba(75, 192, 192, 0.5)"
-          ],
-          hoverBackgroundColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)"
-          ]
-        }
-      ];
       const data = await this.$axios.$get(
         "revisions/getArticleRevsByUserType",
         {
@@ -106,27 +88,27 @@ export default {
           },
           params: {
             title: this.title,
-            fromyear: this.yFrom,
-            toyear: this.yTo
+            fromyear: this.yFrom ? this.yFrom : "1970-01-01",
+            toyear: this.yTo ? this.yTo : new Date().toISOString().substr(0, 10)
           }
         }
       );
-      console.log(this.ydatasets[0].data); 
+
       for (var i = 0; i < data.data.length; i++) {
         this.ylabels.push(data.data[i]._id);
 
-        data.data[i].admin_revisions
-          ? this.ydatasets[0].data.push(parseInt(data.data[i].admin_revisions))
-          : null;
-        data.data[i].bot_revisions
-          ? this.ydatasets[0].data.push(parseInt(data.data[i].bot_revisions))
-          : null;
-        data.data[i].anon_revisions
-          ? this.ydatasets[0].data.push(parseInt(data.data[i].anon_revisions))
-          : null;
-        data.data[i].regular_revisions
-          ? this.ydatasets[0].data.push(parseInt(data.data[i].regular_revisions))
-          : null;
+        if (data.data[i].admin_revisions) {
+          this.ydatasets[0].data.push(parseInt(data.data[i].admin_revisions));
+        }
+        if (data.data[i].bot_revisions) {
+          this.ydatasets[0].data.push(parseInt(data.data[i].bot_revisions));
+        }
+        if (data.data[i].anon_revisions) {
+          this.ydatasets[0].data.push(parseInt(data.data[i].anon_revisions));
+        }
+        if (data.data[i].regular_revisions) {
+          this.ydatasets[0].data.push(parseInt(data.data[i].regular_revisions));
+        }
       }
 
       this.$emit("loaded", true);
@@ -142,16 +124,22 @@ export default {
   watch: {
     title: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
+        this.ydatasets[0].data = [];
         this.getIndividualRevisionsByUserType();
       }
     },
     yFrom: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
+        this.ydatasets[0].data = [];
         this.getIndividualRevisionsByUserType();
       }
     },
     yTo: function(nvalue, ovalue) {
       if (nvalue !== ovalue) {
+        this.ylabels = [];
+        this.ydatasets[0].data = [];
         this.getIndividualRevisionsByUserType();
       }
     }

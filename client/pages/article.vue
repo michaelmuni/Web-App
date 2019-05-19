@@ -3,9 +3,9 @@
     <v-flex class="mr-5 mt-2" sm2>
       <v-layout column>
         <h4 class="ml-2">Filter By Date</h4>
-        <DatePicker @picked="setFrom" @cleared="clearFrom" title="From"/>
-        <DatePicker @picked="setTo" @cleared="clearTo" title="To"/>
-        <v-btn color="primary" flat @click="setProps" :disabled="off">Get Revisions</v-btn>
+        <DatePicker @picked="setFrom" title="From"/>
+        <DatePicker @picked="setTo" title="To"/>
+        <v-btn color="primary" flat>Get Revisions</v-btn>
       </v-layout>
     </v-flex>
     <v-container>
@@ -28,19 +28,22 @@
           </template>
         </v-autocomplete>
       </v-toolbar>
-      <ArticleContainer :articleTitle="title" :yearFrom="xFrom" :yearTo="xTo" :update="update" @done="xdone"/>
+      <ArticleContainer ref="arc" :articleTitle="title" :yearFrom="yFrom" :yearTo="yTo" :update="update"/>
+      <ChartContainer v-if="show" type="individual" :title="title" :yearFrom="yFrom" :yearTo="yTo" :update="update"/>
     </v-container>
   </v-layout>
 </template>
 
 <script>
 import ArticleContainer from "~/components/ArticleContainer.vue";
+import ChartContainer from "~/components/ChartContainer.vue";
 import DatePicker from "~/components/DatePicker.vue";
 
 export default {
   middleware: ["auth"],
   components: {
     ArticleContainer,
+    ChartContainer,
     DatePicker
   },
   data: () => ({
@@ -50,10 +53,9 @@ export default {
     loading: false,
     yFrom: null,
     yTo: null,
-    xFrom: null,
-    xTo: null,
     update: false,
-    off: false
+    off: false,
+    show: false
   }),
   methods: {
     async getAllTitles() {
@@ -72,25 +74,6 @@ export default {
     },
     setTo(value) {
       this.yTo = value;
-    },
-    clearFrom() { 
-      this.yFrom = null; 
-    }, 
-    clearTo() { 
-      this.yTo = null; 
-    },
-    setProps() {
-      this.xFrom = this.yFrom;
-      this.xTo = this.yTo;
-
-      if (this.title) {
-        this.off = true;
-        this.update = true;
-      }
-    },
-    xdone() {
-      this.update = false;
-      this.off = false;
     }
   },
   beforeCreate() {
@@ -98,6 +81,16 @@ export default {
   },
   created() {
     this.getAllTitles();
+  },
+  watch: {
+    title: function(nvalue, oldvalue) {
+      {
+        if (nvalue !== oldvalue) {
+          this.update = true;
+          this.show = true;
+        }
+      }
+    }
   }
 };
 </script>

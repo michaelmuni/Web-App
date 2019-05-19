@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  props: ["type", "title", "yFrom", "yTo"],
+  props: ["type", "title", "yFrom", "yTo", "change"],
   data: () => ({
     xlabels: [],
     xdatasets: [
