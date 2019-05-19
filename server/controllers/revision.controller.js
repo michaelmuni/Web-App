@@ -640,6 +640,10 @@ module.exports = {
   },
 
   displaySummaryInformation: async (request, response, next) => {
+    function readAsync(file, callback) {
+      fs.readFile(file, "utf8", callback);
+    }
+
     reqTitle = request.query.title;
     reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
     reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
@@ -647,41 +651,53 @@ module.exports = {
     stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
     stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
 
-    var summaryPipeline = [
-      {
-        $match: {
-          title: reqTitle,
-          $expr: {
-            $and: [
-              {
-                $gte: ["$timestamp", stringFrom]
-              },
-              {
-                $lte: ["$timestamp", stringTo]
-              }
-            ]
+    const files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
+
+    async.map(files, readAsync, async (error, contents) => {
+      var userBots = contents[0].toString().split("\r\n");
+      var userAdminActive = contents[1].toString().split("\r\n");
+      var userAdminInactive = contents[2].toString().split("\r\n");
+      var userAdminSemi = contents[3].toString().split("\r\n");
+      var userAdminFormer = contents[4].toString().split("\r\n");
+      var allAdmins = userAdminActive.concat(userAdminInactive.concat(userAdminSemi.concat(userAdminFormer)));
+
+      var summaryPipeline = [
+        {
+          $match: {
+            title: reqTitle,
+            $expr: {
+              $and: [
+                {
+                  $gte: ["$timestamp", stringFrom]
+                },
+                {
+                  $lte: ["$timestamp", stringTo]
+                }
+              ]
+            }
+          }
+        },
+        {
+          $facet: {
+            Total: [{ $count: "Total" }],
+            TopFive: [{ $match: { $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }]}}, 
+            { $group: { _id: "$user", usercount: { $sum: 1 } } }, { $sort: { usercount: -1 } }, { $limit: 5 }]
           }
         }
-      },
-      {
-        $facet: {
-          Total: [{ $count: "Total" }],
-          TopFive: [{ $group: { _id: "$user", usercount: { $sum: 1 } } }, { $sort: { usercount: -1 } }, { $limit: 5 }]
+      ];
+
+      await revisionModel.aggregate(summaryPipeline, function(err, result) {
+        if (err) {
+          response.json({ status: "error", message: "Problem with fetching individual article summary", data: null });
+
+          next();
+        } else {
+          response.json({ status: "success", message: "Fetched individual summary article for " + reqTitle, data: result });
+
+          next();
         }
-      }
-    ];
-
-    await revisionModel.aggregate(summaryPipeline, function(err, result) {
-      if (err) {
-        response.json({ status: "error", message: "Problem with fetching individual article summary", data: null });
-
-        next();
-      } else {
-        response.json({ status: "success", message: "Fetched individual summary article for " + reqTitle, data: result });
-
-        next();
-      }
-    });
+      });
+    }); 
   },
 
   getArticleRevisionsByUserType: async (request, response, next) => {
