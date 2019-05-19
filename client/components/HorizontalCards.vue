@@ -8,18 +8,27 @@
         <div class="loader" v-if="loading">
           <v-progress-circular :width="5" :size="50" color="primary" indeterminate></v-progress-circular>
         </div>
-        <Article v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
+        <ArticleTile v-for="item in items" :key="item.title" v-bind:title="item.title" v-bind:info="item.info"/>
+        <!-- <v-list row>
+          <template v-for="item in items" v-bind:title="item.title">
+            <v-list-tile-content :key="item.title">
+              <v-list-tile-title v-html="item.title"></v-list-tile-title>
+              <v-list-tile-sub-title v-html="item.info"></v-list-tile-sub-title>
+              <v-divider></v-divider>
+            </v-list-tile-content>
+          </template>
+        </v-list>-->
       </v-layout>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
-import Article from "~/components/Article.vue";
+import ArticleTile from "~/components/ArticleTile.vue";
 
 export default {
   components: {
-    Article
+    ArticleTile
   },
   props: ["objectType", "objectHeader", "counter"],
   data: () => ({
@@ -212,7 +221,7 @@ export default {
   },
   watch: {
     counter: function(value) {
-      if (/^\d+$/.test(value)) {
+      if (/^\d+$/.test(value) && value > 0) {
         //console.log(value);
         switch (this.objectType) {
           case "hirev":

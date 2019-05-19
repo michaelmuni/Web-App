@@ -1,52 +1,25 @@
 <template>
-  <v-card class="elevation-12">
-    <v-toolbar dark color="primary">
-      <v-toolbar-title>Registration</v-toolbar-title>
-    </v-toolbar>
-    <v-card-text>
-      <v-form lazy-validation ref="regForm">
-        <v-text-field
-          name="firstName"
-          label="First Name"
-          type="text"
-          v-model="firstName"
-          required
-          :rules="validationRules.name"
-        ></v-text-field>
-        <v-text-field
-          name="lastName"
-          label="Last Name"
-          type="text"
-          v-model="lastName"
-          required
-          :rules="validationRules.name"
-        ></v-text-field>
-        <v-text-field
-          name="email"
-          label="Email"
-          type="email"
-          v-model="email"
-          required
-          :rules="validationRules.email"
-        ></v-text-field>
-        <v-text-field
-          id="password"
-          name="password"
-          label="Password"
-          type="password"
-          v-model="password"
-          required
-          :rules="validationRules.password"
-        ></v-text-field>
-      </v-form>
-    </v-card-text>
-    <v-alert dismissible v-if="error" type="error">{{ errorMessage }}</v-alert>
-    <v-card-actions>
-      <v-btn flat small color="error" @click="resetForm">Reset</v-btn>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="register">Register</v-btn>
-    </v-card-actions>
-  </v-card>
+  <v-container>
+    <v-card class="elevation-12">
+      <v-toolbar dark color="primary">
+        <v-toolbar-title>Registration</v-toolbar-title>
+      </v-toolbar>
+      <v-card-text>
+        <v-form lazy-validation ref="regForm">
+          <v-text-field name="firstName" label="First Name" type="text" v-model="firstName" required :rules="validationRules.name"></v-text-field>
+          <v-text-field name="lastName" label="Last Name" type="text" v-model="lastName" required :rules="validationRules.name"></v-text-field>
+          <v-text-field name="email" label="Email" type="email" v-model="email" required :rules="validationRules.email"></v-text-field>
+          <v-text-field id="password" name="password" label="Password" type="password" v-model="password" required :rules="validationRules.password"></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-alert dismissible v-if="error" type="error">{{ errorMessage }}</v-alert>
+      <v-card-actions>
+        <v-btn flat small color="error" @click="resetForm">Reset</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="register">Register</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
