@@ -6,11 +6,11 @@
         <h4>Summary Between: {{ yearFrom ? yearFrom : "---" }} to {{ yearTo ? yearTo : "---" }}</h4>
       </v-layout>
     </v-card-title>
-    <v-card-text v-if="update">Total revisions: {{ revisionCount }}</v-card-text>
+    <v-card-text v-if="show">Total revisions: {{ revisionCount }}</v-card-text>
     <v-divider></v-divider>
     <v-card-text>
       <v-divider></v-divider>
-      <v-card v-if="update" width="100%">
+      <v-card v-if="show" width="100%">
         <v-card-title class="primary white--text">Top 5 Regular Users</v-card-title>
         <v-card-text>
           <v-list>
@@ -24,7 +24,7 @@
         </v-card-text>
       </v-card>
     </v-card-text>
-    <ChartContainer v-if="update" type="individual"/>
+    <ChartContainer v-if="show" type="individual"/>
   </v-card>
 </template>
 
@@ -37,7 +37,8 @@ export default {
   },
   data: () => ({
     revisionCount: 0,
-    regUsers: []
+    regUsers: [],
+    show: false
   }),
   props: ["articleTitle", "yearFrom", "yearTo", "update"],
   methods: {
@@ -48,6 +49,7 @@ export default {
         this.yearTo !== null &&
         this.update === true
       ) {
+        this.show = true;
         const data = await this.$axios.$get("revisions/displaySummaryInfo", {
           headers: {
             "x-access-token": this.$store.state.user.authUser.data.token
