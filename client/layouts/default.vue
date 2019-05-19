@@ -1,11 +1,13 @@
 <template>
   <v-app light>
     <Navbar/>
-    <v-content class="px-4 py-5 my-5">
-      <transition name="fade" mode="in-out" appear>
-        <nuxt ref="page"/>
-      </transition>
-    </v-content>
+    <v-container>
+      <v-content class="px-4 py-5 my-5">
+        <transition name="fade" mode="in-out" appear>
+          <nuxt ref="page"/>
+        </transition>
+      </v-content>
+    </v-container>
     <v-footer class="customFooter elevation-4" :fixed="fixed" app>
       <v-divider/>
       <span>&copy; 2019</span>
