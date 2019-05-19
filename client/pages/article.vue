@@ -3,8 +3,8 @@
     <v-flex class="mr-5 mt-2" sm2>
       <v-layout column>
         <h4 class="ml-2">Filter By Date</h4>
-        <DatePicker @picked="setFrom" title="From"/>
-        <DatePicker @picked="setTo" title="To"/>
+        <DatePicker @picked="setFrom" title="From" @cleared="resetFrom"/>
+        <DatePicker @picked="setTo" title="To" @cleared="resetTo"/>
         <v-btn color="primary" flat>Get Revisions</v-btn>
       </v-layout>
     </v-flex>
@@ -74,6 +74,12 @@ export default {
     },
     setTo(value) {
       this.yTo = value;
+    },
+    resetFrom() {
+      this.yFrom = null;
+    },
+    resetTo() {
+      this.yTo = null;
     }
   },
   beforeCreate() {

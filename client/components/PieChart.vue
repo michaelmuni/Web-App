@@ -117,8 +117,6 @@ export default {
   created() {
     if (this.type === "overview") {
       this.getRevisionsByUserType();
-    } else {
-      this.getIndividualRevisionsByUserType();
     }
   },
   watch: {

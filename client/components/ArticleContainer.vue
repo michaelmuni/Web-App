@@ -51,8 +51,10 @@ export default {
           },
           params: {
             title: this.articleTitle,
-            fromyear: this.yearFrom,
+            fromyear: this.yearFrom ? this.yearFrom : "1970-01-01",
             toyear: this.yearTo
+              ? this.yearTo
+              : new Date().toISOString().substring(0, 10)
           }
         });
 

@@ -24,8 +24,10 @@ export default {
       this.$refs.menu.save(date);
       this.$emit("picked", date);
     },
-    onClearClicked() {
+    onClearClicked(date) {
       this.$emit("cleared");
+      this.date = null;
+      this.$refs.menu.save(date);
     }
   }
 };
