@@ -22,6 +22,7 @@ export default {
   methods: {
     save(date) {
       this.$refs.menu.save(date);
+      this.$emit("picked", date);
     }
   }
 };

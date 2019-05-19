@@ -3,8 +3,9 @@
     <v-flex class="mr-5 mt-2" sm2>
       <v-layout column>
         <h4 class="ml-2">Filter By Date</h4>
-        <DatePicker title="From"/>
-        <DatePicker title="To"/>
+        <DatePicker @picked="setFrom" title="From"/>
+        <DatePicker @picked="setTo" title="To"/>
+        <v-btn color="primary" flat @click="setProps" :disabled="off">Filter</v-btn>
       </v-layout>
     </v-flex>
     <v-container>
@@ -27,7 +28,7 @@
           </template>
         </v-autocomplete>
       </v-toolbar>
-      <ArticleContainer :articleTitle="title"/>
+      <ArticleContainer :articleTitle="title" :yearFrom="xFrom" :yearTo="xTo" :update="update" @done="xdone"/>
     </v-container>
   </v-layout>
 </template>
@@ -46,7 +47,13 @@ export default {
     titles: [],
     title: null,
     counter: 0,
-    loading: false
+    loading: false,
+    yFrom: null,
+    yTo: null,
+    xFrom: null,
+    xTo: null,
+    update: false,
+    off: false
   }),
   methods: {
     async getAllTitles() {
@@ -59,6 +66,22 @@ export default {
       if (data) {
         this.titles = data.data;
       }
+    },
+    setFrom(value) {
+      this.yFrom = value;
+    },
+    setTo(value) {
+      this.yTo = value;
+    },
+    setProps() {
+      this.xFrom = this.yFrom;
+      this.xTo = this.yTo;
+      this.update = true;
+      this.off = true;
+    },
+    xdone() {
+      this.update = false;
+      this.off = false;
     }
   },
   beforeCreate() {
