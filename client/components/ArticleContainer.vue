@@ -45,8 +45,6 @@ export default {
     async getArticleSummary() {
       if (
         this.articleTitle !== null &&
-        this.yearFrom !== null &&
-        this.yearTo !== null &&
         this.update === true
       ) {
         this.show = true;
@@ -61,11 +59,17 @@ export default {
           }
         });
 
-        this.revisionCount = data.data[0].Total[0].Total;
+        this.revisionCount = data.data[0].Total.length == 1 ? data.data[0].Total[0].Total : 0;
         this.regUsers = [];
 
-        for (var i = 0; i < 5; i++) {
+        var topfivelength = data.data[0].TopFive.length;
+
+        for (var i = 0; i < topfivelength; i++) {
           this.regUsers.push(data.data[0].TopFive[i]);
+        }
+
+        for (var i = 0; i < 5 - topfivelength; i++) {
+          this.regUsers.push({"_id": "N/A", "usercount": 0});
         }
 
         this.$emit("done", true);

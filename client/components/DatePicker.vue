@@ -1,7 +1,7 @@
 <template>
   <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
     <template v-slot:activator="{ on }">
-      <v-text-field v-model="date" :label="title" prepend-icon="event" readonly v-on="on"></v-text-field>
+      <v-text-field v-model="date" :label="title" clearable @click:clear="onClearClicked()" prepend-icon="event" readonly v-on="on"></v-text-field>
     </template>
     <v-date-picker ref="picker" v-model="date" :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" @change="save"></v-date-picker>
   </v-menu>
@@ -23,6 +23,9 @@ export default {
     save(date) {
       this.$refs.menu.save(date);
       this.$emit("picked", date);
+    }, 
+    onClearClicked() {
+      this.$emit("cleared");  
     }
   }
 };

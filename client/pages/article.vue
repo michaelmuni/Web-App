@@ -3,9 +3,9 @@
     <v-flex class="mr-5 mt-2" sm2>
       <v-layout column>
         <h4 class="ml-2">Filter By Date</h4>
-        <DatePicker @picked="setFrom" title="From"/>
-        <DatePicker @picked="setTo" title="To"/>
-        <v-btn color="primary" flat @click="setProps" :disabled="off">Filter</v-btn>
+        <DatePicker @picked="setFrom" @cleared="clearFrom" title="From"/>
+        <DatePicker @picked="setTo" @cleared="clearTo" title="To"/>
+        <v-btn color="primary" flat @click="setProps" :disabled="off">Get Revisions</v-btn>
       </v-layout>
     </v-flex>
     <v-container>
@@ -48,10 +48,10 @@ export default {
     title: null,
     counter: 0,
     loading: false,
-    yFrom: "1970-01-01",
-    yTo: new Date().toISOString().substr(0, 10),
-    xFrom: "1970-01-01",
-    xTo: new Date().toISOString().substr(0, 10),
+    yFrom: null,
+    yTo: null,
+    xFrom: null,
+    xTo: null,
     update: false,
     off: false
   }),
@@ -73,13 +73,19 @@ export default {
     setTo(value) {
       this.yTo = value;
     },
+    clearFrom() { 
+      this.yFrom = null; 
+    }, 
+    clearTo() { 
+      this.yTo = null; 
+    },
     setProps() {
       this.xFrom = this.yFrom;
       this.xTo = this.yTo;
 
-      if (this.xFrom && this.xTo && this.title) {
-        this.update = true;
+      if (this.title) {
         this.off = true;
+        this.update = true;
       }
     },
     xdone() {

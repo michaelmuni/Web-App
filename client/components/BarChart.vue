@@ -157,8 +157,8 @@ export default {
           },
           params: {
             title: this.title,
-            fromyear: this.yFrom ? this.yFrom : "1970-01-01",
-            toyear: this.yTo ? this.yTo : new Date().toISOString().substr(0, 10)
+            fromyear: this.yFrom,
+            toyear: this.yTo
           }
         }
       );

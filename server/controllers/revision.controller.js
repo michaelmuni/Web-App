@@ -645,8 +645,8 @@ module.exports = {
     }
 
     reqTitle = request.query.title;
-    reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
-    reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
+    reqFrom = request.query.fromyear != null ? request.query.fromyear : "1970";
+    reqTo = request.query.toyear != null ? request.query.toyear : new Date().getFullYear().toString();
 
     stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
     stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
@@ -706,8 +706,8 @@ module.exports = {
     }
 
     reqTitle = request.query.title;
-    reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
-    reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
+    reqFrom = request.query.fromyear != null ? request.query.fromyear : "1970";
+    reqTo = request.query.toyear != null ? request.query.toyear : new Date().getFullYear().toString();
 
     stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
     stringTo = reqTo.toString().concat("-12-31T23:59:59Z");
@@ -896,8 +896,8 @@ module.exports = {
     const files = ["data/bot.txt", "data/admin_active.txt", "data/admin_inactive.txt", "data/admin_semi_active.txt", "data/admin_former.txt"];
 
     reqTitle = request.query.title;
-    reqFrom = request.query.fromyear ? request.query.fromyear : "1970";
-    reqTo = request.query.toyear ? request.query.toyear : new Date().getFullYear().toString();
+    reqFrom = request.query.fromyear != null ? request.query.fromyear : "1970";
+    reqTo = request.query.toyear != null ? request.query.toyear : new Date().getFullYear().toString();
 
     stringFrom = reqFrom.toString().concat("-01-01T00:00:00Z");
     stringTo = reqTo.toString().concat("-12-31T23:59:59Z");

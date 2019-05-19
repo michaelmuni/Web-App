@@ -106,12 +106,12 @@ export default {
           },
           params: {
             title: this.title,
-            fromyear: this.yFrom ? this.yFrom : "1970-01-01",
-            toyear: this.yTo ? this.yTo : new Date().toISOString().substr(0, 10)
+            fromyear: this.yFrom,
+            toyear: this.yTo
           }
         }
       );
-
+      console.log(this.ydatasets[0].data); 
       for (var i = 0; i < data.data.length; i++) {
         this.ylabels.push(data.data[i]._id);
 
@@ -124,8 +124,8 @@ export default {
         data.data[i].anon_revisions
           ? this.ydatasets[0].data.push(parseInt(data.data[i].anon_revisions))
           : null;
-        data.data[i].reg_revisions
-          ? this.ydatasets[0].data.push(parseInt(data.data[i].reg_revisions))
+        data.data[i].regular_revisions
+          ? this.ydatasets[0].data.push(parseInt(data.data[i].regular_revisions))
           : null;
       }
 
