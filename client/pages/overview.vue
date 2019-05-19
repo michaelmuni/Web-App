@@ -20,7 +20,6 @@
         <HorizontalCards objectType="oldest" objectHeader="Articles with Longest History" :counter="counter"/>
         <HorizontalCards objectType="youngest" objectHeader="Article with Shortest History" :counter="counter"/>
       </v-layout>
-      <!-- <BarChart/> -->
       <keep-alive>
         <ChartContainer/>
       </keep-alive>

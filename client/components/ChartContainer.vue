@@ -1,26 +1,50 @@
 <template>
-  <v-stepper v-model="e1">
-    <v-stepper-header>
-      <v-stepper-step step="1">Yearly Revision Distribution by User Types</v-stepper-step>
-      <v-divider></v-divider>
-      <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
-    </v-stepper-header>
-    <v-progress-linear height="2" v-model="value" :active="show" :indeterminate="query" :query="true"></v-progress-linear>
-    <v-stepper-items>
-      <v-stepper-content step="1">
-        <v-layout fill-height column>
-          <BarChart @loaded="progress"/>
-          <v-btn color="primary" @click="e1 = 2">Next</v-btn>
-        </v-layout>
-      </v-stepper-content>
-      <v-stepper-content step="2">
-        <v-layout fill-height column>
-          <PieChart @loaded="progress"/>
-          <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
-        </v-layout>
-      </v-stepper-content>
-    </v-stepper-items>
-  </v-stepper>
+  <div>
+    <v-stepper v-model="e1" v-if="type === 'overview'">
+      <v-stepper-header>
+        <v-stepper-step step="1">Yearly Revision Distribution by User Types</v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
+      </v-stepper-header>
+      <v-progress-linear height="2" v-model="value" :active="show" :indeterminate="query" :query="true"></v-progress-linear>
+      <v-stepper-items>
+        <v-stepper-content step="1">
+          <v-layout fill-height column>
+            <BarChart @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 2">Next</v-btn>
+          </v-layout>
+        </v-stepper-content>
+        <v-stepper-content step="2">
+          <v-layout fill-height column>
+            <PieChart @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
+          </v-layout>
+        </v-stepper-content>
+      </v-stepper-items>
+    </v-stepper>
+    <v-stepper v-else v-model="e1">
+      <v-stepper-header>
+        <v-stepper-step step="1">Yearly Revision Distribution by User Types</v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="2">Revision Number Distribution by User Type</v-stepper-step>
+      </v-stepper-header>
+      <v-progress-linear height="2" v-model="value" :active="show" :indeterminate="query" :query="true"></v-progress-linear>
+      <v-stepper-items>
+        <v-stepper-content step="1">
+          <v-layout fill-height column>
+            <BarChart @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 2">Next</v-btn>
+          </v-layout>
+        </v-stepper-content>
+        <v-stepper-content step="2">
+          <v-layout fill-height column>
+            <PieChart @loaded="progress"/>
+            <v-btn color="primary" @click="e1 = 1">Previous</v-btn>
+          </v-layout>
+        </v-stepper-content>
+      </v-stepper-items>
+    </v-stepper>
+  </div>
 </template>
 
 <script>
@@ -41,6 +65,7 @@ export default {
     show: true,
     interval: 0
   }),
+  props: ["type"],
   methods: {
     nextStep() {
       if (this.n === this.steps) {

@@ -76,8 +76,11 @@ export default {
     setProps() {
       this.xFrom = this.yFrom;
       this.xTo = this.yTo;
-      this.update = true;
-      this.off = true;
+
+      if (this.xFrom && this.xTo && this.title) {
+        this.update = true;
+        this.off = true;
+      }
     },
     xdone() {
       this.update = false;
