@@ -221,7 +221,7 @@ export default {
   },
   watch: {
     counter: function(value) {
-      if (/^\d+$/.test(value)) {
+      if (/^\d+$/.test(value) && value > 0) {
         //console.log(value);
         switch (this.objectType) {
           case "hirev":
