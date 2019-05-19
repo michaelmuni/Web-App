@@ -5,7 +5,7 @@
         <h4 class="ml-2">Filter By Date</h4>
         <DatePicker @picked="setFrom" title="From" @cleared="resetFrom"/>
         <DatePicker @picked="setTo" title="To" @cleared="resetTo"/>
-        <v-btn color="primary" flat>Get Revisions</v-btn>
+        <!-- <v-btn color="primary" flat>Get Revisions</v-btn> -->
       </v-layout>
     </v-flex>
     <v-container>
