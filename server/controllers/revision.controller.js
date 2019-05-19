@@ -1083,11 +1083,15 @@ module.exports = {
             json3 = results.anon;
             json4 = results.regular;
 
-            mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
-            mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
-            mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
+            mapped_res = json1.concat(json2.concat(json3.concat(json4)));
+            var result = mapped_res.filter(function(v) {
+              return this[v._id] ? !Object.assign(this[v._id], v) : (this[v._id] = v);     
+            }, {});
+            //mapped_res = json1.map(x => Object.assign(x, json2.find(y => y._id == x._id)));
+            //mapped_res = mapped_res.map(x => Object.assign(x, json3.find(y => y._id == x._id)));
+            //mapped_res = mapped_res.map(x => Object.assign(x, json4.find(y => y._id == x._id)));
 
-            response.json({ status: "success", message: "got article revisions by user type and year", data: mapped_res });
+            response.json({ status: "success", message: "got article revisions by user type and year", data: result });
             next();
           }
         }
