@@ -629,7 +629,7 @@ module.exports = {
 
             mapped_res = json1.concat(json2.concat(json3.concat(json4)));
             var result = mapped_res.filter(function(v) {
-              return this[v._id] ? !Object.assign(this[v._id], v) : (this[v._id] = v);     
+              return this[v._id] ? !Object.assign(this[v._id], v) : (this[v._id] = v);
             }, {});
 
             response.json({ status: "success", message: "got stuff", data: result });
@@ -1086,7 +1086,7 @@ module.exports = {
 
             mapped_res = json1.concat(json2.concat(json3.concat(json4)));
             var result = mapped_res.filter(function(v) {
-              return this[v._id] ? !Object.assign(this[v._id], v) : (this[v._id] = v);     
+              return this[v._id] ? !Object.assign(this[v._id], v) : (this[v._id] = v);
             }, {});
 
             response.json({ status: "success", message: "got article revisions by user type and year", data: result });
@@ -1100,9 +1100,11 @@ module.exports = {
   getArticlesByAuthor: async (request, response, next) => {
     reqAuthor = request.query.author;
 
-    var RevisionsByAuthorPipeline = [{ $match: { user: reqAuthor } }, 
-      { $group: { _id: "$title", no_revisions: { $sum: 1 }, timestamp_list: {$addToSet: "$timestamp"} } }, 
-      { $sort: { no_revisions: -1 } }];
+    var RevisionsByAuthorPipeline = [
+      { $match: { user: reqAuthor } },
+      { $group: { _id: "$title", no_revisions: { $sum: 1 }, timestamp_list: { $addToSet: "$timestamp" } } },
+      { $sort: { no_revisions: -1 } }
+    ];
 
     await revisionModel.aggregate(RevisionsByAuthorPipeline, function(err, result) {
       if (err) {
@@ -1139,9 +1141,7 @@ module.exports = {
     await revisionModel.aggregate(
       [
         {
-          $match: {
-            anon: { $exists: false }
-          }
+          $match: { $and: [{ anon: { $exists: false } }, { user: { $exists: true } }] }
         },
         {
           $group: {
