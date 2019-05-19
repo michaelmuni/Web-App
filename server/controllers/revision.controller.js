@@ -1098,7 +1098,9 @@ module.exports = {
   getArticlesByAuthor: async (request, response, next) => {
     reqAuthor = request.query.author;
 
-    var RevisionsByAuthorPipeline = [{ $match: { user: reqAuthor } }, { $group: { _id: "$title", no_revisions: { $sum: 1 } } }, { $sort: { no_revisions: -1 } }];
+    var RevisionsByAuthorPipeline = [{ $match: { user: reqAuthor } }, 
+      { $group: { _id: "$title", no_revisions: { $sum: 1 }, timestamp_list: {$addToSet: "$timestamp"} } }, 
+      { $sort: { no_revisions: -1 } }];
 
     await revisionModel.aggregate(RevisionsByAuthorPipeline, function(err, result) {
       if (err) {
