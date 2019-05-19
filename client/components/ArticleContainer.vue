@@ -24,7 +24,7 @@
         </v-card-text>
       </v-card>
     </v-card-text>
-    <ChartContainer v-if="show" type="individual"/>
+    <ChartContainer v-if="show" type="individual" :title="articleTitle" :yearFrom="yearFrom" :yearTo="yearTo"/>
   </v-card>
 </template>
 
