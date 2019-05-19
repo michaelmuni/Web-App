@@ -680,8 +680,12 @@ module.exports = {
         {
           $facet: {
             Total: [{ $count: "Total" }],
-            TopFive: [{ $match: { $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }]}}, 
-            { $group: { _id: "$user", usercount: { $sum: 1 } } }, { $sort: { usercount: -1 } }, { $limit: 5 }]
+            TopFive: [
+              { $match: { $and: [{ user: { $nin: allAdmins } }, { user: { $nin: userBots } }, { anon: { $exists: false } }] } },
+              { $group: { _id: "$user", usercount: { $sum: 1 } } },
+              { $sort: { usercount: -1 } },
+              { $limit: 5 }
+            ]
           }
         }
       ];
@@ -697,7 +701,7 @@ module.exports = {
           next();
         }
       });
-    }); 
+    });
   },
 
   getArticleRevisionsByUserType: async (request, response, next) => {
@@ -1125,5 +1129,36 @@ module.exports = {
         next();
       }
     });
+  },
+
+  getListOfAuthors: async (request, response, next) => {
+    await revisionModel.aggregate(
+      [
+        {
+          $match: {
+            anon: { $exists: false }
+          }
+        },
+        {
+          $group: {
+            _id: "$user",
+            user: {
+              $sum: 1
+            }
+          }
+        }
+      ],
+      function(error, result) {
+        if (error) {
+          response.json({ status: "error", message: "Didnt get stuff", data: null });
+
+          next();
+        } else {
+          response.json({ status: "success", message: "got stuff", data: result });
+
+          next();
+        }
+      }
+    );
   }
 };

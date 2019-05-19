@@ -47,5 +47,7 @@ router.get("/oldestRevision", revisionController.getOldestRevision);
 router.get("/getArticlesByAuthor", revisionController.getArticlesByAuthor);
 //fetches timestamps of revisions made to specified article by specified author
 router.get("/trackArticleRevsByAuthor", revisionController.trackArticleRevisionsByAuthor);
+//get list of authors
+router.get("/getAllAuthors", revisionController.getListOfAuthors);
 
 module.exports = router;
