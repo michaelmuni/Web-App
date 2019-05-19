@@ -81,6 +81,21 @@ export default {
       if (value === true) {
         this.getArticleSummary();
       }
+    },
+    articleTitle: function(nvalue, ovalue) {
+      if (nvalue !== ovalue) {
+        this.getArticleSummary();
+      }
+    },
+    yearFrom: function(nvalue, ovalue) {
+      if (nvalue !== ovalue) {
+        this.getArticleSummary();
+      }
+    },
+    yearTo: function(nvalue, ovalue) {
+      if (nvalue !== ovalue) {
+        this.getArticleSummary();
+      }
     }
   }
 };
