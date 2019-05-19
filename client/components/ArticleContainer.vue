@@ -3,14 +3,14 @@
     <v-card-title primary-title>
       <v-layout column>
         <h2>Title: {{ articleTitle ? articleTitle : "N/A" }}</h2>
-        <h4>Summary between {{ yearFrom ? yearFrom : "---" }} to {{ yearTo ? yearTo : "---" }}</h4>
+        <h4>Summary Between: {{ yearFrom ? yearFrom : "---" }} to {{ yearTo ? yearTo : "---" }}</h4>
       </v-layout>
     </v-card-title>
-    <v-card-text>Revisions {{ revisionCount }}</v-card-text>
+    <v-card-text v-if="update">Total revisions: {{ revisionCount }}</v-card-text>
     <v-divider></v-divider>
     <v-card-text>
       <v-divider></v-divider>
-      <v-card width="100%">
+      <v-card v-if="update" width="100%">
         <v-card-title class="primary white--text">Top 5 Regular Users</v-card-title>
         <v-card-text>
           <v-list>
@@ -24,11 +24,17 @@
         </v-card-text>
       </v-card>
     </v-card-text>
+    <ChartContainer v-if="update" type="individual"/>
   </v-card>
 </template>
 
 <script>
+import ChartContainer from "~/components/ChartContainer";
+
 export default {
+  components: {
+    ChartContainer
+  },
   data: () => ({
     revisionCount: 0,
     regUsers: []
